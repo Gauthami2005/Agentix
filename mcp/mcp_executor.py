@@ -50,4 +50,8 @@ def execute_tool(task):
                 else:
                     return func("dynamic-programming")
 
+            # Daily Task MCP
+            elif selected_tool == "daily_task":
+                return func()
+
     return f"No suitable tool found for: {selected_tool}"

@@ -1,0 +1,13 @@
+{
+  "name": "agentix-workspace",
+  "version": "1.0.0",
+  "description": "Agentix Workspace Root",
+  "scripts": {
+    "backend": "venv/bin/uvicorn main:api --reload --port 8000",
+    "frontend": "npm --prefix frontend run dev",
+    "dev": "concurrently --kill-others-on-fail --prefix \"[{name}]\" --names \"backend,frontend\" --prefix-colors \"cyan,magenta\" \"npm run backend\" \"npm run frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

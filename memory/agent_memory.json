@@ -177,6 +177,80 @@
                     "content": "Successfully opened LeetCode array page"
                 }
             ]
+        },
+        {
+            "id": "c4da0a13-599e-407d-ab12-071796e84094",
+            "title": "Help me crack DSA in 60 days",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Help me crack DSA in 60 days"
+                },
+                {
+                    "role": "assistant",
+                    "content": "No suitable tool found for: daily_task"
+                },
+                {
+                    "role": "user",
+                    "content": "Help me crack DSA in 60 days"
+                },
+                {
+                    "role": "assistant",
+                    "content": "No suitable tool found for: daily_task"
+                },
+                {
+                    "role": "user",
+                    "content": "open leetcode"
+                },
+                {
+                    "role": "assistant",
+                    "content": "No suitable tool found for: daily_task"
+                }
+            ]
+        },
+        {
+            "id": "e1bdff3a-4396-4120-b5e1-c90c54faf7aa",
+            "title": "Help me crack DSA in 60 days",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Help me crack DSA in 60 days"
+                },
+                {
+                    "role": "assistant",
+                    "content": "No suitable tool found for: daily_task"
+                },
+                {
+                    "role": "user",
+                    "content": "give me a rode map for dsa in 60 dyas"
+                },
+                {
+                    "role": "assistant",
+                    "content": "['Create Grid With Exactly One Path (Easy)', 'Maximum Manhattan Distance After All Moves (Medium)', 'Check Good Integer (Easy)', 'Minimum Lights to Illuminate a Road (Medium)', 'Frequency Balance Subarray (Medium)', 'Digit Frequency Score (Easy)', 'Valid Subarrays With Matching Sum Digits II (Hard)', 'Sum of Compatible Numbers in Range I (Easy)', 'Valid Subarrays With Matching Sum Digits I (Medium)', 'Minimum Swaps to Move Zeros to End (Easy)', 'Password Strength (Medium)', 'Limit Occurrences in Sorted Array (Easy)', 'Count Good Integers in a Range (Hard)', 'Exactly One Consecutive Set Bits Pair (Easy)', 'Minimum Energy to Maintain Brightness (Medium)']"
+                },
+                {
+                    "role": "user",
+                    "content": "give me a rode map for dsa in 60 dyas"
+                },
+                {
+                    "role": "assistant",
+                    "content": "**Rode Map for DSA in 60 Days?**\n==========================\n\nI'm excited to help you create a study plan for DSA (Data Structures and Algorithms) in 60 days!\n\nBefore we dive into creating a customized roadmap, I want to clarify that a one-size-fits-all solution might not be the most effective approach. Everyone learns at their own pace, and it's essential to consider your current level of expertise, available study time, and learning style.\n\nThat being said, I can offer some general guidance and tools to help you create a tailored plan.\n\n### Let's Get Started!\n\nTo create a customized study roadmap, I'd love to know more about your current situation. Please answer the following questions:\n\n1. What is your current level of expertise in DSA (beginner, intermediate, or advanced)?\n2. How many hours can you dedicate to studying each day?\n3. Are there specific areas of DSA you'd like to focus on (e.g., arrays, linked lists, trees, graphs, etc.)?\n\nOnce I have this information, I can provide you with a more personalized study plan and offer suggestions on how to make the most of your 60-day study period.\n\n**Additional Resources**\n\nIn the meantime, I can also offer some additional resources to help you get started:\n\n* I can provide you with a list of essential DSA topics to focus on.\n* I can help you find LeetCode questions related to specific topics or difficulty levels.\n* I can assist you in setting up a study schedule and tracking your progress.\n\nLet me know how I can best support you in your DSA learning journey!"
+                }
+            ]
+        },
+        {
+            "id": "473c968d-330b-4175-87d2-72df02ca32c4",
+            "title": "give 60 days road map for placements",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "give 60 days road map for placements"
+                },
+                {
+                    "role": "assistant",
+                    "content": "**60-Day Roadmap for Placements**\n=====================================\n\n### Week 1-2: Assessment and Preparation (Days 1-14)\n\n* **Day 1-2:** Review your strengths and weaknesses, and assess your current knowledge in the field.\n* **Day 3-4:** Identify the placement process, requirements, and expectations.\n* **Day 5-6:** Set specific, measurable, achievable, relevant, and time-bound (SMART) goals for the placement process.\n\n### Week 3-4: Building Foundations (Days 15-28)\n\n* **Day 7-10:** Focus on developing a strong foundation in data structures and algorithms.\n* **Day 11-14:** Learn and practice leetcode problems (Medium-Hard difficulty):\n  \u2022 LeetCode Problems\n    \u2022 [Problem 1: Two Sum](https://leetcode.com/problems/two-sum/) (Easy)\n    \u2022 [Problem 2: Add Two Numbers](https://leetcode.com/problems/add-two-numbers/) (Medium)\n* **Day 15-18:** Review and practice coding skills, including problem-solving and debugging.\n* **Day 19-22:** Develop a solid understanding of object-oriented programming (OOP) concepts.\n\n### Week 5-6: Advanced Topics and Practice (Days 29-42)\n\n* **Day 23-26:** Study advanced topics, such as:\n  \u2022 System design and architecture\n  \u2022 Databases and SQL\n  \u2022 Operating systems and file systems\n* **Day 27-30:** Practice leetcode problems (Hard difficulty):\n  \u2022 LeetCode Problems\n    \u2022 [Problem 1: Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/) (Hard)\n    \u2022 [Problem 2: Maximum Subarray](https://leetcode.com/problems/maximum-subarray/) (Hard)\n* **Day 31-34:** Focus on developing a strong understanding of computer science fundamentals.\n\n### Week 7-8: Final Preparation and Practice (Days 43-60)\n\n* **Day 35-42:** Practice leetcode problems (Medium-Hard difficulty):\n  \u2022 LeetCode Problems\n    \u2022 [Problem 1: Longest Palindromic Substring](https://leetcode.com/problems/longest-palindromic-substring/) (Medium)\n    \u2022 [Problem 2: Valid Parentheses](https://leetcode.com/problems/valid-parentheses/) (Easy)\n* **Day 43-49:** Review and practice coding skills, including problem-solving and debugging.\n* **Day 50-60:** Focus on final preparation and practice, and get ready for placements."
+                }
+            ]
         }
     ]
 }
