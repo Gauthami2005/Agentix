@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   CheckCircle2,
+  ChevronDown,
   Circle,
   Flame,
   Loader2,
@@ -68,7 +69,8 @@ function cleanTaskKey(text) {
 }
 
 export default function Dashboard() {
-  const [tasks, setTasks] = useState(DEFAULT_TASKS);
+  const [roadmaps, setRoadmaps] = useState([]);
+  const [activeRoadmapId, setActiveRoadmapId] = useState("");
   const [taskSource, setTaskSource] = useState("fallback");
   const [done, setDone] = useState(() => {
     try {
@@ -78,9 +80,31 @@ export default function Dashboard() {
       return {};
     }
   });
-  const [roadmap, setRoadmap] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const activeRoadmap = useMemo(() => {
+    return roadmaps.find((r) => r.id === activeRoadmapId) || null;
+  }, [roadmaps, activeRoadmapId]);
+
+  const activeTasks = useMemo(() => {
+    if (!activeRoadmap?.roadmap) return DEFAULT_TASKS;
+    const lines = activeRoadmap.roadmap.split("\n");
+    const parsedTasks = [];
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("-") || trimmed.startsWith("*") || trimmed.startsWith("+")) {
+        const cleaned = trimmed.replace(/^[-*+•\s]+/, "").trim();
+        if (cleaned) {
+          parsedTasks.push(cleaned);
+        }
+      }
+      if (parsedTasks.length === 5) {
+        break;
+      }
+    }
+    return parsedTasks.length > 0 ? parsedTasks : DEFAULT_TASKS;
+  }, [activeRoadmap]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -88,19 +112,23 @@ export default function Dashboard() {
     try {
       const [tasksRes, roadmapRes] = await Promise.all([fetchTasks(), fetchRoadmap()]);
 
-      if (tasksRes.tasks.length > 0) {
-        setTasks(tasksRes.tasks);
-        setTaskSource(tasksRes.source === "roadmap" ? "roadmap" : "fallback");
+      const entries = roadmapRes.roadmaps ?? [];
+      setRoadmaps(entries);
+
+      if (entries.length > 0) {
+        setActiveRoadmapId((prev) => {
+          const exists = entries.some((r) => r.id === prev);
+          return exists && prev ? prev : entries[entries.length - 1].id;
+        });
+        setTaskSource("roadmap");
       } else {
-        setTasks(DEFAULT_TASKS);
+        setActiveRoadmapId("");
         setTaskSource("fallback");
       }
-
-      const entries = roadmapRes.roadmaps ?? [];
-      setRoadmap(entries.length ? entries[entries.length - 1] : null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load dashboard data");
-      setTasks(DEFAULT_TASKS);
+      setRoadmaps([]);
+      setActiveRoadmapId("");
       setTaskSource("fallback");
     } finally {
       setLoading(false);
@@ -112,19 +140,19 @@ export default function Dashboard() {
   }, [loadData]);
 
   const completedCount = useMemo(
-    () => tasks.filter((task) => !!done[cleanTaskKey(task)]).length,
-    [tasks, done],
+    () => activeTasks.filter((task) => !!done[cleanTaskKey(task)]).length,
+    [activeTasks, done],
   );
 
-  const progressPct = tasks.length
-    ? Math.round((completedCount / tasks.length) * 100)
+  const progressPct = activeTasks.length
+    ? Math.round((completedCount / activeTasks.length) * 100)
     : 0;
 
-  const targetGoal = roadmap?.title ?? "DSA Interview Ready — 3 Month Sprint";
+  const targetGoal = activeRoadmap?.title ?? "DSA Interview Ready — 3 Month Sprint";
 
   const timelineLines = useMemo(() => {
-    if (!roadmap?.roadmap) return [];
-    return roadmap.roadmap
+    if (!activeRoadmap?.roadmap) return [];
+    return activeRoadmap.roadmap
       .split("\n")
       .map((line) => line.trim())
       .filter(
@@ -135,7 +163,7 @@ export default function Dashboard() {
       )
       .slice(0, 5)
       .map((line) => line.replace(/^[-*•]\s*/, ""));
-  }, [roadmap]);
+  }, [activeRoadmap]);
 
   const upcomingReminder =
     timelineLines[0] ?? "Complete today's theory review before starting LeetCode problems.";
@@ -158,9 +186,9 @@ export default function Dashboard() {
     setError(null);
     try {
       await clearRoadmap();
-      setTasks([]);
+      setRoadmaps([]);
+      setActiveRoadmapId("");
       setTaskSource("fallback");
-      setRoadmap(null);
       localStorage.removeItem("completedTasks");
       setDone({});
     } catch (err) {
@@ -205,6 +233,24 @@ export default function Dashboard() {
               <p className="text-sm text-slate-400">
                 LangGraph + MCP agent ready · {formatDate()}
               </p>
+              {roadmaps.length > 0 && (
+                <div className="relative mt-3 inline-block w-full max-w-xs">
+                  <select
+                    value={activeRoadmapId}
+                    onChange={(e) => setActiveRoadmapId(e.target.value)}
+                    className="w-full appearance-none rounded-xl border border-cyan-neon/30 bg-slate-900/80 px-4 py-2 pr-10 text-xs font-semibold text-slate-200 shadow-[0_0_15px_rgba(6,182,212,0.05)] transition-all hover:border-cyan-neon/60 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] focus:border-cyan-neon focus:outline-none focus:shadow-[0_0_15px_rgba(6,182,212,0.2)] cursor-pointer"
+                  >
+                    {roadmaps.map((r) => (
+                      <option key={r.id} value={r.id} className="bg-slate-950 text-slate-200">
+                        {r.title}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-cyan-neon">
+                    <ChevronDown className="h-4 w-4" />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-wrap items-center gap-6">
@@ -248,7 +294,7 @@ export default function Dashboard() {
             <Card>
               <div className="mb-4 flex items-center justify-between">
                 <p className="text-xs text-slate-400">
-                  {completedCount}/{tasks.length} completed
+                  {completedCount}/{activeTasks.length} completed
                   {taskSource === "roadmap" ? " · synced from roadmap" : " · default queue"}
                 </p>
                 <button
@@ -267,7 +313,7 @@ export default function Dashboard() {
               </div>
 
               <ul className="space-y-2">
-                {tasks.map((task, index) => {
+                {activeTasks.map((task, index) => {
                   const checked = !!done[cleanTaskKey(task)];
                   return (
                     <li key={`${task}-${index}`}>

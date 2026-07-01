@@ -16,9 +16,9 @@ import {
 import { sendMessageToAgent } from "../lib/api";
 
 const QUICK_PROMPTS = [
-  "Help me crack DSA in 60 days",
-  "Find easy Graph problems on LeetCode",
-  "Show today's tasks",
+  "Create a 30-day roadmap to master Dynamic Programming from scratch",
+  "Give me a roadmap to learn System Design for beginner developers",
+  "Build a study plan for cracking FAANG technical interviews in 3 months"
 ];
 
 const MAX_CHARS = 2000;
@@ -267,8 +267,8 @@ export default function ChatBotUI() {
             {/* Input container with focus glow */}
             <div
               className={`rounded-2xl border bg-slate-900/50 p-1 transition-all duration-300 backdrop-blur-md ${isFocused
-                  ? "border-cyan-neon/50 shadow-[0_0_20px_rgba(6,182,212,0.25),0_0_40px_rgba(139,92,246,0.08)]"
-                  : "border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                ? "border-cyan-neon/50 shadow-[0_0_20px_rgba(6,182,212,0.25),0_0_40px_rgba(139,92,246,0.08)]"
+                : "border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
                 }`}
             >
               <div className="flex items-end gap-2 rounded-xl bg-void/60 p-2">

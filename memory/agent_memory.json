@@ -163,6 +163,104 @@
                 {
                     "role": "assistant",
                     "content": "**LeetCode Study Tasks: Graph Problems**\n=====================================\n\n### Easy Problems\n* **Create Grid With Exactly One Path**: Build a grid that has exactly one path from the top-left to the bottom-right corner.\n* **Digit Frequency Score**: Calculate the frequency score of digits in a given number.\n* **Check Good Integer**: Determine if a given number is a good integer based on certain conditions.\n* **Sum of Compatible Numbers in Range I**: Find the sum of compatible numbers within a given range.\n* **Limit Occurrences in Sorted Array**: Limit the occurrences of a certain number in a sorted array.\n* **Exactly One Consecutive Set Bits Pair**: Find numbers with exactly one pair of consecutive set bits.\n\n### Medium Problems\n* **Maximum Total Sum of K Selected Elements**: Find the maximum total sum of k selected elements from a given array.\n* **Maximum Manhattan Distance After All Moves**: Calculate the maximum Manhattan distance after all possible moves.\n* **Minimum Lights to Illuminate a Road**: Determine the minimum number of lights required to illuminate a road.\n* **Frequency Balance Subarray**: Find the frequency balance subarray in a given array.\n* **Valid Subarrays With Matching Sum Digits II**: Check for valid subarrays with matching sum digits in a given array.\n* **Password Strength**: Determine the strength of a given password.\n* **Valid Subarrays With Matching Sum Digits I**: Check for valid subarrays with matching sum digits in a given array.\n\n### Hard Problems\n* **Count Good Integers in a Range**: Count the number of good integers within a given range.\n* **Valid Subarrays With Matching Sum Digits II**: Check for valid subarrays with matching sum digits in a given array."
+                },
+                {
+                    "role": "user",
+                    "content": "Show today's tasks"
+                },
+                {
+                    "role": "user",
+                    "content": "Find easy Graph problems on LeetCode"
+                },
+                {
+                    "role": "user",
+                    "content": "Help me crack DSA in 60 days"
+                }
+            ]
+        },
+        {
+            "id": "1ae54563-adb5-4ca3-a57c-4b36cadba8d7",
+            "title": "Help me crack DSA in 60 days",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Help me crack DSA in 60 days"
+                },
+                {
+                    "role": "assistant",
+                    "content": "**DSA 60-Day Roadmap**\n=====================\n\n### Week 1-5: Fundamentals and Basic Topics (Days 1-25)\n\n#### Week 1: Arrays, Strings, and Basic Concepts (Days 1-7)\n\n* **Topics to Study:**\n  \u2022 Arrays: Introduction, Multi-Dimensional Arrays, Array Operations\n  \u2022 Strings: String Operations, Substring, Concatenation"
+                },
+                {
+                    "role": "user",
+                    "content": "Find easy Graph problems on LeetCode"
+                },
+                {
+                    "role": "assistant",
+                    "content": "# Find Easy Graph Problems on LeetCode\n\n## Action Items\n\n* Study the following easy graph problems on LeetCode:\n* Review and attempt to solve each problem to improve understanding and skills\n\n## Easy Graph Problems on LeetCode\n\n* **Create Grid With Exactly One Path** (Easy)\n* **Digit Frequency Score** (Easy)\n* **Exactly One Consecutive Set Bits Pair** (Easy)\n* **Limit Occurrences in Sorted Array** (Easy)\n* **Minimum Swaps to Move Zeros to End** (Easy)\n* **Sum of Compatible Numbers in Range I** (Easy)"
+                }
+            ]
+        },
+        {
+            "id": "8414ac40-1e55-4481-adb5-711d165f8d3c",
+            "title": "Give me a roadmap to learn System Design for beginner developers",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Give me a roadmap to learn System Design for beginner developers"
+                },
+                {
+                    "role": "assistant",
+                    "content": "**System Design Roadmap for Beginner Developers**\n==============================================\n\n**Phase 1: Fundamentals and Basics (Weeks 1-4)**\n----------------------------------------------\n\n### Week 1: Introduction to System Design\n\n* Topics to study:\n  \u2022 Definition of System Design\n  \u2022 Types of System Design (e.g., microservices, monolithic, event-driven)\n\n### Phase 2: System Design Principles (Weeks 5-8)\n---------------------------------------------\n\n### Week 5: System Design Principles\n\n* Topics to study:\n  \u2022 Scalability\n  \u2022 Availability\n  \u2022 Consistency\n  \u2022 Partition Tolerance (CAP Theorem)\n\n### Week 6: System Design Patterns\n\n* Topics to study:\n  \u2022 Microservices Architecture\n  \u2022 Event-Driven Architecture\n  \u2022 Service-Oriented Architecture\n\n### Week 7: System Design Considerations\n\n* Topics to study:\n  \u2022 Performance Optimization\n  \u2022 Security\n  \u2022 Data Storage and Retrieval\n\n### Week 8: System Design Case Studies\n\n* Topics to study:\n  \u2022 Real-world system design examples\n  \u2022 Analysis of system design trade-offs\n\n### Phase 3: System Design Implementation (Weeks 9-12)\n-------------------------------------------------\n\n### Week 9: System Design Tools and Technologies\n\n* Topics to study:\n  \u2022 Programming languages (e.g., Java, Python, Go)\n  \u2022 Frameworks and libraries (e.g., Spring, Django, React)\n  \u2022 Databases (e.g., relational, NoSQL, graph databases)\n\n### Week 10: System Design Implementation\n\n* Topics to study:\n  \u2022 System design implementation in a programming language\n  \u2022 Integration with databases and other systems\n\n### Week 11: System Design Testing and Debugging\n\n* Topics to study:\n  \u2022 Unit testing and integration testing\n  \u2022 Debugging and troubleshooting techniques\n\n### Week 12: System Design Deployment and Maintenance\n\n* Topics to study:\n  \u2022 System deployment strategies (e.g., cloud, on-premises)\n  \u2022 System maintenance and monitoring\n\n### Phase 4: Advanced System Design Topics (Weeks 13-16)\n---------------------------------------------------\n\n### Week 13: Advanced System Design Patterns\n\n* Topics to study:\n  \u2022 Caching and content delivery networks (CDNs)\n  \u2022 Load balancing and autoscaling\n  \u2022 Service discovery and registry\n\n### Week 14: Advanced System Design Considerations\n\n* Topics to study:\n  \u2022 Distributed transactions and two-phase commit\n  \u2022 Consensus algorithms (e.g., leader election, distributed locks)\n  \u2022 Fault tolerance and failover\n\n### Week 15: Advanced System Design Case Studies\n\n* Topics to study:\n  \u2022 Real-world system design examples\n  \u2022 Analysis of system design trade-offs\n\n### Week 16: System Design Career Development\n\n* Topics to study:\n  \u2022 System design interview preparation\n  \u2022 System design career development and growth\n\n**Additional Resources**\n------------------------\n\n* Online courses and tutorials\n* Books and articles on system design\n* System design communities and forums"
+                }
+            ]
+        },
+        {
+            "id": "ea1d757c-bdc1-44c4-a416-699b46123319",
+            "title": "Build a study plan for cracking FAANG technical interviews in 3 months",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Build a study plan for cracking FAANG technical interviews in 3 months"
+                },
+                {
+                    "role": "assistant",
+                    "content": "**3-Month Study Plan for FAANG Technical Interviews**\n=====================================================\n\n**Month 1: Building Foundation and Fundamentals (Weeks 1-4)**\n--------------------------------------------------------\n\n### Week 1: Data Structures and Algorithms\n\n* **Trees (B-Trees, AVL Trees, Binary Search Trees)**\n* Take a 30-minute practice test on LeetCode/HackerRank every other day\n* LeetCode Practice:\n  \u2022 **Easy**:\n    + [Simple BST Insertion](https://leetcode.com/problems/simple-bst-insertion/)\n    + [B-Trees](https://leetcode.com/problems/b-trees/)\n  \u2022 **Medium**:\n    + [Validate BST](https://leetcode.com/problems/validate-binary-search-tree/)\n    + [AVL Tree](https://leetcode.com/problems/avl-tree/)\n  \u2022 **Hard**:\n    + [Balanced BST](https://leetcode.com/problems/balanced-binary-search-tree/)\n\n### Week 2: Object-Oriented Programming and Design Patterns\n\n* Study object-oriented programming concepts and design patterns\n* Practice coding exercises on OOP and design patterns\n\n### Week 3: System Design and Databases\n\n* Study system design principles and database concepts\n* Practice designing a scalable system and database schema\n\n### Week 4: Review and Practice\n\n* Review all concepts and practice coding exercises daily\n* Take a 30-minute practice test on LeetCode/HackerRank every other day\n\n**Month 2: Advanced Topics (Weeks 5-8)**\n--------------------------------------\n\n### Week 5: Advanced Data Structures and Algorithms\n\n* Study advanced data structures and algorithms (e.g., graph, heap, etc.)\n* Practice coding exercises on advanced data structures and algorithms\n\n### Week 6: Database Systems and SQL\n\n* Study database systems and SQL concepts\n* Practice writing SQL queries and designing database schema\n\n### Week 7: Operating Systems and Networking\n\n* Study operating systems and networking concepts\n* Practice designing a scalable system and network architecture\n\n### Week 8: Review and Practice\n\n* Review all concepts and practice coding exercises daily\n* Take a 30-minute practice test on LeetCode/HackerRank every other day\n\n**Month 3: Final Preparation (Weeks 9-12)**\n-----------------------------------------\n\n### Week 9: Review and Practice\n\n* Review all concepts and practice coding exercises daily\n* Focus on weak areas and practice problems accordingly\n\n### Week 10: Mock Interviews and Practice\n\n* Prepare for mock interviews and practice coding exercises\n* Get feedback on coding style and interview performance\n\n### Week 11: Final Review and Practice\n\n* Review all concepts and practice coding exercises daily\n* Focus on weak areas and practice problems accordingly\n\n### Week 12: Final Preparation and Submission\n\n* Final review and practice before the interview\n* Make sure to submit all applications and prepare for the interview"
+                }
+            ]
+        },
+        {
+            "id": "53dac9a7-00a7-4529-bc36-659198ef796a",
+            "title": "Build a study plan for cracking FAANG technical interviews in 3 months",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Build a study plan for cracking FAANG technical interviews in 3 months"
+                },
+                {
+                    "role": "assistant",
+                    "content": "**Roadmap for Cracking FAANG Technical Interviews in 3 Months**\n===========================================================\n\n**Month 1: Fundamentals and Core Topics (Weeks 1-4)**\n------------------------------------------------\n\n### Week 1: Data Structures and Algorithms\n\n* Topics to Study:\n  + Arrays and Linked Lists\n  + Stacks and Queues\n\n### Week 2: Greedy Algorithms and Dynamic Programming\n\n* Topics to Study:\n  + Greedy Algorithms (e.g. coin change, activity selection)\n  + Dynamic Programming (e.g. Fibonacci series, longest common subsequence)\n  + LeetCode Problems:\n    - **Medium**: 55. Jump Game (difficulty: Medium)\n    - **Medium**: 322. Coin Change (difficulty: Medium)\n    - **Hard**: 53. Maximum Subarray (difficulty: Hard)\n\n### Week 3: Sorting and Searching Algorithms\n\n* Topics to Study:\n  + Sorting Algorithms (e.g. bubble sort, quick sort)\n  + Searching Algorithms (e.g. linear search, binary search)\n  + LeetCode Problems:\n    - **Medium**: 912. Sort an Array (difficulty: Medium)\n    - **Medium**: 447. Number of Boomerangs (difficulty: Medium)\n    - **Hard**: 15. 3Sum (difficulty: Hard)\n\n### Week 4: Graph Algorithms and Bit Manipulation\n\n* Topics to Study:\n  + Graph Algorithms (e.g. BFS, DFS)\n  + Bit Manipulation (e.g. bitwise AND, OR, XOR)\n  + LeetCode Problems:\n    - **Medium**: 200. Number of Islands (difficulty: Medium)\n    - **Medium**: 7. Reverse Integer (difficulty: Medium)\n    - **Hard**: 127. Word Ladder (difficulty: Hard)\n\n**Action Items for Week 1**\n-------------------------\n\n* Study Arrays and Linked Lists\n* Practice implementing Stacks and Queues\n* Complete LeetCode problems for Week 1\n\n**Additional Resources**\n----------------------\n\n* Review relevant textbook chapters and online resources\n* Participate in coding challenges and hackathons\n* Practice whiteboarding exercises with a friend or mentor"
+                }
+            ]
+        },
+        {
+            "id": "cb684536-e249-47b9-a865-00dc1bcb5da6",
+            "title": "Build a study plan for cracking FAANG technical interviews in 3 months",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Build a study plan for cracking FAANG technical interviews in 3 months"
+                },
+                {
+                    "role": "assistant",
+                    "content": "**3-Month Study Plan for Cracking FAANG Technical Interviews**\n===========================================================\n\n### Weeks 1-4: Fundamentals and Data Structures (Weeks 1-4, Days 1-28)\n\n#### Week 1: Introduction to Programming Fundamentals\n----------------------------------------------------\n\n* **Study topics:**\n  \u2022 Variables\n  \u2022 Data types\n  \u2022 Control structures (if-else, switch)\n  \u2022 Functions\n  \u2022 Loops (for, while)\n  \u2022 Object-oriented programming (OOP) concepts\n* **Recommended practice:**\n  1. **Practice problems on loops, functions, and control structures**\n    * LeetCode: _Easy, Medium_ problems (100-200 problems)\n    * Examples:\n      \u2022 LeetCode 1: [Problem Title] (Easy)\n      \u2022 LeetCode 2: [Problem Title] (Medium)"
+                },
+                {
+                    "role": "user",
+                    "content": "Create a 30-day roadmap to master Dynamic Programming from scratch"
+                },
+                {
+                    "role": "assistant",
+                    "content": "**30-Day Roadmap to Master Dynamic Programming from Scratch**\n=============================================================\n\n**Week 1: Fundamentals and Introduction (Days 1-7)**\n---------------------------------------------------\n\n### Topics to Study:\n\n* **Day 1-2: Introduction to Dynamic Programming**\n  * Definition, history, and importance of Dynamic Programming\n  * Basic concepts: Overlapping Subproblems, Optimal Substructure\n\n**Week 2: Solving Problems with Dynamic Programming (Days 8-14)**\n----------------------------------------------------------\n\n### Topics to Study:\n\n* **Day 8-10: Fibonacci Series, Longest Common Subsequence**\n  * Fibonacci Series:\n    * LeetCode 509: Fibonacci Number\n    * LeetCode 746: Min Cost Climbing Stairs\n  * Longest Common Subsequence:\n    * LeetCode 1143: Longest Common Subsequence\n    * LeetCode 72: Edit Distance\n* **Day 11-12: Knapsack Problem, Matrix Chain Multiplication**\n  * 0/1 Knapsack Problem:\n    * LeetCode 416: Partition Equal Subset Sum\n    * LeetCode 474: Ones and Zeroes\n  * Matrix Chain Multiplication:\n    * LeetCode 646: Maximum Length of Pair Chain\n    * LeetCode 77: Combinations\n* **Day 13-14: Shortest Paths, Huffman Coding**\n  * Shortest Paths:\n    * LeetCode 743: Network Delay Time\n    * LeetCode 743: Network Delay Time\n  * Huffman Coding:\n    * LeetCode 297: Serialize and Deserialize Binary Tree\n    * LeetCode 106: Construct Binary Tree from Inorder and Postorder Traversal\n\n**Week 3: Advanced Dynamic Programming (Days 15-21)**\n---------------------------------------------------\n\n### Topics to Study:\n\n* **Day 15-17: Dynamic Programming on Trees and Graphs**\n  * Dynamic Programming on Trees:\n    * LeetCode 437: Path Sum III\n    * LeetCode 965: Univalued Binary Tree\n  * Dynamic Programming on Graphs:\n    * LeetCode 685: Redundant Connection\n    * LeetCode 685: Redundant Connection\n* **Day 18-19: Greedy Algorithms and DP**\n  * Greedy Algorithms:\n    * LeetCode 45: Jump Game II\n    * LeetCode 53: Maximum Subarray\n  * Greedy Algorithms and DP:\n    * LeetCode 53: Maximum Subarray\n    * LeetCode 377: Combination Sum IV\n* **Day 20-21: Practice Problems and Review**\n  * Practice Problems:\n    * LeetCode 300: Longest Increasing Subsequence\n    * LeetCode 62: Unique Paths\n  * Review:\n    * Review all concepts and practice problems covered in the past 3 weeks\n\n**Week 4: Mastering Dynamic Programming (Days 22-30)**\n---------------------------------------------------\n\n### Topics to Study:\n\n* **Day 22-24: Dynamic Programming with Recursion**\n  * LeetCode 804: Unique Paths with Obstacles\n  * LeetCode 55: Jump Game\n* **Day 25-27: Dynamic Programming with Memoization**\n  * LeetCode 343: Integer Break\n  * LeetCode 91: Decode Ways\n* **Day 28-30: Practice Problems and Review**\n  * Practice Problems:\n    * LeetCode 322: Coin Change\n    * LeetCode 198: House Robber\n  * Review:\n    * Review all concepts and practice problems covered in the past 4 weeks"
                 }
             ]
         }
