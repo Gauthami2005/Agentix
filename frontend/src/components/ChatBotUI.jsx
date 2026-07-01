@@ -178,6 +178,7 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
   const [isFocused, setIsFocused] = useState(false);
   const [error, setError] = useState(null);
   const [chatMode, setChatMode] = useState("general_chat");
+  const [browserStatus, setBrowserStatus] = useState(null);
 
   const scrollAnchorRef = useRef(null);
   const textareaRef = useRef(null);
@@ -209,7 +210,7 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
       setIsLoading(true);
 
       try {
-        const { reply, sessionId: nextSessionId, chatMode: resChatMode, youtubeMetadata } = await sendMessageToAgent(
+        const { reply, sessionId: nextSessionId, chatMode: resChatMode, youtubeMetadata, status, problemName } = await sendMessageToAgent(
           trimmed,
           sessionId,
           chatMode,
@@ -219,6 +220,13 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
 
         if (chatMode === "generate_roadmap" && setHasNewRoadmapNotification) {
           setHasNewRoadmapNotification(true);
+        }
+
+        if (status === "launching_browser") {
+          setBrowserStatus(problemName || "LeetCode Problem");
+          setTimeout(() => {
+            setBrowserStatus(null);
+          }, 6000);
         }
 
         const agentMessage = {
@@ -267,12 +275,25 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
   const nearLimit = charCount > MAX_CHARS * 0.85;
 
   return (
-    <div className="flex h-full min-h-[600px] flex-col bg-void">
+    <div className="relative flex h-full min-h-[600px] flex-col bg-void">
       {/* Ambient glow */}
       <div
         className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(6,182,212,0.06),transparent),radial-gradient(ellipse_50%_40%_at_100%_80%,rgba(139,92,246,0.04),transparent)]"
         aria-hidden
       />
+
+      {browserStatus && (
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 pointer-events-none">
+          <div className="rounded-xl border border-cyan-neon bg-slate-950/95 p-4 text-center shadow-[0_0_30px_rgba(6,182,212,0.5)] backdrop-blur-md animate-pulse">
+            <p className="font-mono text-xs font-bold text-cyan-neon uppercase tracking-widest">
+              ⚡ Agentic Browser Hook Triggered
+            </p>
+            <p className="mt-1.5 text-sm font-semibold text-slate-100 leading-relaxed">
+              Launching Chromium Window for "{browserStatus}"...
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="relative flex min-h-0 flex-1 flex-col">
         {/* Header */}

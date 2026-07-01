@@ -1,19 +1,11 @@
 {
     "roadmaps": [
         {
-            "id": "655c58e5-6dd5-4b84-a6fa-a393d763304d",
-            "title": "Cracking FAANG Technical Interviews in 3 Months",
-            "roadmap": "{\n  \"roadmap_title\": \"Cracking FAANG Technical Interviews in 3 Months\",\n  \"duration\": \"3 Months\",\n  \"phases\": [\n    {\n      \"phase_title\": \"Phase 1: Data Structures and Algorithms Fundamentals\",\n      \"description\": \"Mastering essential data structures and algorithms to crack technical interviews\",\n      \"core_topics\": [\n        \"Arrays and Linked Lists\",\n        \"Stacks and Queues\",\n        \"Trees (BST, AVL, etc.)\",\n        \"Graphs (Basic, DFS, BFS)\",\n        \"Bit Manipulation\",\n        \"Recursion and Backtracking\"\n      ]\n    },\n    {\n      \"phase_title\": \"Phase 2: Coding Challenges and Problem-Solving Strategies\",\n      \"description\": \"Developing strategies to tackle complex coding challenges and practice problem-solving\",\n      \"core_topics\": [\n        \"LeetCode, HackerRank, and other popular platforms\",\n        \"System Design and Scalability\",\n        \"Common Interview Patterns and Tricks\",\n        \"Practice with Mock Interviews and Feedback\",\n        \"Time and Space Complexity Analysis\"\n      ]\n    },\n    {\n      \"phase_title\": \"Phase 3: Advanced Topics and Specialized Skills\",\n      \"description\": \"Mastering advanced topics and specialized skills to become a top candidate\",\n      \"core_topics\": [\n        \"Dynamic Programming (Memoization, Tabulation, etc.)\",\n        \"Greedy Algorithms and Divide and Conquer\",\n        \"Advanced Data Structures (Heaps, Trie, etc.)\",\n        \"Database Systems and SQL\",\n        \"Operating System Fundamentals\"\n      ]\n    },\n    {\n      \"phase_title\": \"Phase 4: Final Preparation and Mock Interviews\",\n      \"description\": \"Final preparation and practice to crack FAANG technical interviews\",\n      \"core_topics\": [\n        \"Review and Practice of All Core Topics\",\n        \"Mock Interviews and Feedback Session\",\n        \"Common Interview Questions and Patterns\",\n        \"Final Preparation and Confidence Building\"\n      ]\n    }\n  ]\n}",
+            "id": "94446999-cf4e-4482-852d-a86f991701ed",
+            "title": "Dynamic Programming Mastery",
+            "roadmap": "{\n  \"roadmap_title\": \"Dynamic Programming Mastery\",\n  \"duration\": \"30 Days\",\n  \"phases\": [\n    {\n      \"phase_title\": \"Phase 1: Fundamentals and Basics\",\n      \"description\": \"Understand the basics of dynamic programming, memoization, and tabulation.\",\n      \"core_topics\": [\n        \"Introduction to Dynamic Programming\",\n        \"Memoization vs Tabulation\",\n        \"1D DP Basics: Fibonacci Series, Longest Common Subsequence\"\n      ]\n    },\n    {\n      \"phase_title\": \"Phase 2: 2D DP and Advanced Topics\",\n      \"description\": \"Master 2D dynamic programming, and understand advanced topics like knapsack, matrix chain multiplication, and longest common subsequence.\",\n      \"core_topics\": [\n        \"2D DP Basics: Matrix Chain Multiplication\",\n        \"Knapsack Problem: 0/1 Knapsack, Unbounded Knapsack\",\n        \"Longest Common Subsequence: 1D, 2D, and Optimized Solutions\"\n      ]\n    },\n    {\n      \"phase_title\": \"Phase 3: Practice and Real-World Applications\",\n      \"description\": \"Apply dynamic programming to solve real-world problems, and practice solving problems on platforms like LeetCode, HackerRank.\",\n      \"core_topics\": [\n        \"Dynamic Programming in Real-World Applications\",\n        \"Practice Problems: LeetCode, HackerRank, and others\",\n        \"Common Mistakes and Best Practices\"\n      ]\n    }\n  ]\n}",
             "completed_days": [],
-            "completed_topics": [
-                "Common Interview Questions and Patterns",
-                "Mock Interviews and Feedback Session",
-                "Review and Practice of All Core Topics",
-                "Final Preparation and Confidence Building",
-                "Trees (BST, AVL, etc.)",
-                "Stacks and Queues",
-                "Arrays and Linked Lists"
-            ]
+            "completed_topics": []
         }
     ]
 }

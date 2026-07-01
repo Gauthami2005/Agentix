@@ -44,6 +44,7 @@ class ChatResponse(BaseModel):
     status: Optional[str] = None
     chat_mode: Optional[str] = None
     youtube_metadata: Optional[list[dict]] = None
+    problem_name: Optional[str] = None
 
 
 class TaskItem(BaseModel):
@@ -98,6 +99,16 @@ def chat(request: ChatRequest) -> ChatResponse:
             from mcp.mcp_executor import execute_tool
             tool_res = execute_tool(message)
             result = {"result": tool_res, "plan": None, "status": "success"}
+        elif selected_tool == "browser_automation":
+            from mcp.mcp_executor import execute_tool
+            tool_res = execute_tool(message)
+            from planner import llm
+            prob_prompt = f"Identify the coding problem name from the user message: '{message}'. Return only the problem name, or 'Unknown' if not found. Do not add extra comments."
+            try:
+                prob_name = llm.invoke(prob_prompt).content.strip()
+            except:
+                prob_name = "LeetCode Coding Problem"
+            result = {"result": tool_res, "plan": None, "status": "launching_browser", "problem_name": prob_name}
         elif request.chatMode == "general_chat":
             from langchain_groq import ChatGroq
             import os
@@ -140,6 +151,7 @@ def chat(request: ChatRequest) -> ChatResponse:
         status=result.get("status"),
         chat_mode=chat_mode,
         youtube_metadata=youtube_metadata,
+        problem_name=result.get("problem_name"),
     )
 
 

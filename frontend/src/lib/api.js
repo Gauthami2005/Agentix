@@ -68,6 +68,8 @@ export async function sendMessageToAgent(text, sessionId, chatMode) {
     sessionId: data.session_id,
     chatMode: data.chat_mode,
     youtubeMetadata: data.youtube_metadata,
+    status: data.status,
+    problemName: data.problem_name,
   };
 }
 

@@ -1,6 +1,6 @@
 
 from mcp.leetcode_mcp import search_problems
-from mcp.browser_mcp import open_leetcode
+from mcp.browser_automation_mcp import execute_browser_workflow
 from mcp.daily_task_mcp import today_tasks
 from mcp.scheduler_mcp import generate_schedule
 from mcp.adaptive_planner_mcp import adapt_schedule
@@ -21,9 +21,9 @@ TOOLS = [
         "name": "browser_automation",
 
         "description":
-        "Opens LeetCode pages in browser automatically",
+        "Physically launches a browser instance to navigate to specific LeetCode problems, search NeetCode solutions, or bookmark progress.",
 
-        "function": open_leetcode
+        "function": execute_browser_workflow
     },
     
     {
