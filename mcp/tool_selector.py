@@ -25,6 +25,7 @@ def select_tool(task):
 
     Guidelines:
     - If the task is a variation of schedule generation or daily study planning (e.g., "Create today's schedule", "Generate today's tasks", "Today's study plan", "What should I study today?", "Schedule my roadmap", or "Run scheduler"), return 'daily_scheduler'.
+    - If the user explicitly asks to learn a technical topic, review a concept, or requests video tutorials or learning playlists (e.g., 'Teach me Graphs', 'Show me tutorials for DP', 'YouTube videos on arrays'), return 'youtube_search'.
 
     Example:
     leetcode_search

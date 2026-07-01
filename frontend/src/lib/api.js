@@ -63,7 +63,12 @@ export function sendChat(message, sessionId, chatMode = "general_chat") {
 
 export async function sendMessageToAgent(text, sessionId, chatMode) {
   const data = await sendChat(text.trim(), sessionId, chatMode);
-  return { reply: data.response, sessionId: data.session_id };
+  return {
+    reply: data.response,
+    sessionId: data.session_id,
+    chatMode: data.chat_mode,
+    youtubeMetadata: data.youtube_metadata,
+  };
 }
 
 export const DEFAULT_TASKS = [

@@ -347,6 +347,28 @@
                     "content": "# Cracking FAANG Technical Interviews in 3 Months\n## Overview\nDuration: 3 Months\n\n## Phase 1: Data Structures and Algorithms Fundamentals\n### Study Plan\n\n* **Learn the basics of data structures and algorithms**\n\t+ Study array, linked list, stack, queue, tree, and graph data structures\n\t+ Understand time and space complexity analysis\n* **Practice LeetCode problems**\n\t+ Easy:\n\t\t- 2Sum\n\t\t- Remove Duplicates from Sorted Array\n\t\t- Best Time to Buy and Sell Stock\n\t+ Medium:\n\t\t- Merge Two Sorted Lists\n\t\t- Longest Substring Without Repeating Characters\n\t\t- Valid Palindrome\n\t+ Hard:\n\t\t- Clone Graph\n\t\t- Word Ladder II\n\t\t- Minimum Window Substring\n* **Review and practice coding challenges**\n\t+ Practice coding on platforms like LeetCode, HackerRank, and CodeForces\n\t+ Focus on writing clean, efficient, and well-documented code\n\n## Phase 2: Advanced Topics and System Design\n### Study Plan\n\n* **Learn advanced data structures and algorithms**\n\t+ Study dynamic programming, greedy algorithms, and bitwise operations\n\t+ Understand how to optimize solutions for large inputs\n* **Practice LeetCode problems**\n\t+ Easy:\n\t\t- Max Subarray\n\t\t- Power of Two\n\t\t- Reverse Bits\n\t+ Medium:\n\t\t- Coin Change\n\t\t- Shortest Path in a Grid\n\t\t- Combination Sum\n\t+ Hard:\n\t\t- Jump Game\n\t\t- Word Break\n\t\t- Maximum Subarray\n* **Learn system design principles**\n\t+ Study how to design scalable and efficient systems\n\t+ Practice designing systems for large inputs and high traffic\n\n## Phase 3: Practice and Interview Preparation\n### Study Plan\n\n* **Practice whiteboarding and coding challenges**\n\t+ Practice explaining complex concepts to others\n\t+ Focus on communicating technical ideas clearly and concisely\n* **Review and practice common interview questions**\n\t+ Study common interview questions for FAANG companies\n\t+ Practice answering behavioral and technical questions\n* **Prepare for common system design interview questions**\n\t+ Study how to design scalable and efficient systems\n\t+ Practice designing systems for large inputs and high traffic"
                 }
             ]
+        },
+        {
+            "id": "2361a9a7-d07e-4206-8d1a-93512d8f4dd2",
+            "title": "Teach me Graphs",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Teach me Graphs"
+                },
+                {
+                    "role": "assistant",
+                    "content": "Here are some high-quality YouTube resources I found for you:"
+                },
+                {
+                    "role": "user",
+                    "content": "can u give me a youtube vedio on dp"
+                },
+                {
+                    "role": "assistant",
+                    "content": "Here are some high-quality YouTube resources I found for you:"
+                }
+            ]
         }
     ]
 }

@@ -115,6 +115,32 @@ function AgentBubble({ message }) {
                 ))}
               </div>
             </div>
+          ) : message.chatMode === "youtube_recommendation" && message.youtubeMetadata ? (
+            <div className="space-y-4">
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200">
+                {message.text}
+              </p>
+              <div className="space-y-4 pt-2">
+                {message.youtubeMetadata.map((video, idx) => (
+                  <div key={idx} className="rounded-2xl border border-slate-800 bg-slate-900/60 p-3.5 shadow-lg space-y-2">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${video.video_id}`}
+                      className="w-full aspect-video rounded-xl border border-slate-800 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                      allowFullScreen
+                      title={video.video_title}
+                    />
+                    <div className="space-y-1">
+                      <h4 className="text-xs font-semibold text-slate-200 line-clamp-2 leading-relaxed">
+                        {video.video_title}
+                      </h4>
+                      <p className="font-mono text-[0.65rem] uppercase tracking-wider text-cyan-neon">
+                        📺 {video.channel_name}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           ) : (
             <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200">
               {message.text}
@@ -183,7 +209,7 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
       setIsLoading(true);
 
       try {
-        const { reply, sessionId: nextSessionId } = await sendMessageToAgent(
+        const { reply, sessionId: nextSessionId, chatMode: resChatMode, youtubeMetadata } = await sendMessageToAgent(
           trimmed,
           sessionId,
           chatMode,
@@ -200,6 +226,8 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
           role: "assistant",
           text: reply,
           timestamp: new Date(),
+          chatMode: resChatMode,
+          youtubeMetadata: youtubeMetadata,
         };
 
         setMessages((prev) => [...prev, agentMessage]);

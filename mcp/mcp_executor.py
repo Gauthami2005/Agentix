@@ -58,4 +58,8 @@ def execute_tool(task):
             elif selected_tool == "daily_scheduler":
                 return func()
 
+            # YouTube Search MCP
+            elif selected_tool == "youtube_search":
+                return func(task)
+
     return f"No suitable tool found for: {selected_tool}"

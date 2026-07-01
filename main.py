@@ -42,6 +42,8 @@ class ChatResponse(BaseModel):
     response: str
     plan: Optional[str] = None
     status: Optional[str] = None
+    chat_mode: Optional[str] = None
+    youtube_metadata: Optional[list[dict]] = None
 
 
 class TaskItem(BaseModel):
@@ -89,7 +91,14 @@ def chat(request: ChatRequest) -> ChatResponse:
     add_message(session_id, "user", message)
 
     try:
-        if request.chatMode == "general_chat":
+        from mcp.tool_selector import select_tool
+        selected_tool = select_tool(message)
+
+        if selected_tool == "youtube_search":
+            from mcp.mcp_executor import execute_tool
+            tool_res = execute_tool(message)
+            result = {"result": tool_res, "plan": None, "status": "success"}
+        elif request.chatMode == "general_chat":
             from langchain_groq import ChatGroq
             import os
             llm = ChatGroq(
@@ -104,10 +113,24 @@ def chat(request: ChatRequest) -> ChatResponse:
                 {"task": message, "iteration": 1},
             )
     except Exception as e:
-        print(f"CRITICAL BACKEND ERROR: {str(e)}")  # Print the actual error to the terminal
+        print(f"CRITICAL BACKEND ERROR: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Backend Agent Error: {str(e)}")
 
     response_text = result.get("result") or result.get("plan") or "No response generated."
+
+    import json
+    youtube_metadata = None
+    chat_mode = None
+
+    try:
+        parsed_youtube = json.loads(response_text)
+        if isinstance(parsed_youtube, list) and len(parsed_youtube) > 0 and "video_id" in parsed_youtube[0]:
+            youtube_metadata = parsed_youtube
+            chat_mode = "youtube_recommendation"
+            response_text = "Here are some high-quality YouTube resources I found for you:"
+    except Exception:
+        pass
+
     add_message(session_id, "assistant", response_text)
 
     return ChatResponse(
@@ -115,6 +138,8 @@ def chat(request: ChatRequest) -> ChatResponse:
         response=response_text,
         plan=result.get("plan"),
         status=result.get("status"),
+        chat_mode=chat_mode,
+        youtube_metadata=youtube_metadata,
     )
 
 
