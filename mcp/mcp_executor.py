@@ -54,4 +54,8 @@ def execute_tool(task):
             elif selected_tool == "daily_task":
                 return func()
 
+            # Daily Scheduler MCP
+            elif selected_tool == "daily_scheduler":
+                return func()
+
     return f"No suitable tool found for: {selected_tool}"

@@ -1,3 +1,14 @@
+import sys
+import os
+from dotenv import load_dotenv
+
+# Load env variables explicitly at startup
+load_dotenv()
+
+# Verify GROQ_API_KEY
+if not os.environ.get("GROQ_API_KEY"):
+    print("ERROR: GROQ_API_KEY environment variable is not set. Please check your .env file.", file=sys.stderr)
+
 from langgraph.graph import StateGraph, END
 from typing import TypedDict
 

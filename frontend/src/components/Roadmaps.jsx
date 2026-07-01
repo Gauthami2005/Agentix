@@ -1,12 +1,34 @@
 import { useCallback, useEffect, useState } from "react";
 import { fetchRoadmap } from "../lib/api";
-import { Calendar, Compass, Loader2, RefreshCw, Sparkles, Target } from "lucide-react";
+import { Calendar, CheckCircle2, Circle, Compass, Loader2, RefreshCw, Sparkles, Target } from "lucide-react";
+
+function cleanTaskKey(text) {
+  if (!text) return "";
+  return text.replace(/^[#\-\*\•\s]+/, "").trim();
+}
 
 export default function Roadmaps() {
   const [roadmaps, setRoadmaps] = useState([]);
   const [selectedRoadmap, setSelectedRoadmap] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [done, setDone] = useState(() => {
+    try {
+      const saved = localStorage.getItem("completedTasks");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const toggleTask = (task) => {
+    const key = cleanTaskKey(task);
+    setDone((prev) => {
+      const next = { ...prev, [key]: !prev[key] };
+      localStorage.setItem("completedTasks", JSON.stringify(next));
+      return next;
+    });
+  };
 
   const loadRoadmaps = useCallback(async () => {
     setLoading(true);
@@ -16,7 +38,13 @@ export default function Roadmaps() {
       const list = res.roadmaps ?? [];
       setRoadmaps(list);
       if (list.length > 0) {
-        setSelectedRoadmap(list[list.length - 1]);
+        setSelectedRoadmap((prev) => {
+          if (prev) {
+            const found = list.find((r) => r.id === prev.id);
+            if (found) return found;
+          }
+          return list[list.length - 1];
+        });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load roadmaps");
@@ -147,6 +175,7 @@ export default function Roadmaps() {
                         step.startsWith("#");
 
                       const cleanStep = step.replace(/^[#\-\*\•\s]+/, "");
+                      const checked = !isHeader && !!done[cleanTaskKey(step)];
 
                       return (
                         <div key={idx} className="relative group">
@@ -159,12 +188,33 @@ export default function Roadmaps() {
                             </>
                           ) : (
                             <>
-                              <span className="absolute -left-[18px] top-2 h-2.5 w-2.5 rounded-full border border-cyan-neon/60 bg-void group-hover:bg-cyan-neon group-hover:shadow-[0_0_6px_rgba(6,182,212,0.5)] transition" />
-                              <div className="rounded-xl border border-cyan-500/5 bg-void/30 p-3.5 hover:border-cyan-neon/20 hover:bg-void/50 transition">
-                                <p className="text-sm leading-relaxed text-slate-300">
-                                  {cleanStep}
-                                </p>
-                              </div>
+                              <span className={`absolute -left-[18px] top-4 h-2.5 w-2.5 rounded-full border bg-void transition ${
+                                checked 
+                                  ? "border-emerald-neon bg-emerald-neon shadow-[0_0_6px_rgba(16,185,129,0.7)]" 
+                                  : "border-cyan-neon/60 group-hover:bg-cyan-neon group-hover:shadow-[0_0_6px_rgba(6,182,212,0.5)]"
+                              }`} />
+                              <button
+                                type="button"
+                                onClick={() => toggleTask(step)}
+                                className={`w-full text-left rounded-xl border p-3.5 transition duration-200 ${
+                                  checked
+                                    ? "border-emerald-neon/40 bg-emerald-neon/5 shadow-[0_0_12px_rgba(16,185,129,0.12)]"
+                                    : "border-cyan-500/5 bg-void/30 hover:border-cyan-neon/20 hover:bg-void/50"
+                                }`}
+                              >
+                                <div className="flex items-start gap-3">
+                                  {checked ? (
+                                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-neon" />
+                                  ) : (
+                                    <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-500 group-hover:text-cyan-neon" />
+                                  )}
+                                  <span className={`text-sm leading-relaxed ${
+                                    checked ? "text-slate-400 line-through" : "text-slate-200"
+                                  }`}>
+                                    {cleanStep}
+                                  </span>
+                                </div>
+                              </button>
                             </>
                           )}
                         </div>

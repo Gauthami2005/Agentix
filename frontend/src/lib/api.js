@@ -10,12 +10,19 @@ async function request(path, init) {
 }
 
 export function fetchTasks() {
-  return request("/api/tasks");
+  return request(`/api/tasks?_t=${Date.now()}`);
 }
 
 export function fetchRoadmap() {
-  return request("/api/roadmap");
+  return request(`/api/roadmap?_t=${Date.now()}`);
 }
+
+export function clearRoadmap() {
+  return request("/api/roadmap", {
+    method: "DELETE",
+  });
+}
+
 
 export function sendChat(message, sessionId) {
   return request("/api/chat", {
@@ -25,7 +32,6 @@ export function sendChat(message, sessionId) {
   });
 }
 
-/** POST /api/chat — LangGraph agent (planner → tools → evaluator) */
 export async function sendMessageToAgent(text, sessionId) {
   const data = await sendChat(text.trim(), sessionId);
   return { reply: data.response, sessionId: data.session_id };

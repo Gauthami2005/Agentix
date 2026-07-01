@@ -8,7 +8,8 @@ from pydantic import BaseModel, Field
 from agent import app as agent_graph
 from memory.memory_manager import add_message, create_session
 from mcp.daily_task_mcp import today_tasks
-from mcp.roadmap_manager import load_roadmaps
+from mcp.roadmap_manager import load_roadmaps, clear_roadmaps
+from memory.schedule_manager import clear_schedule
 
 load_dotenv()
 
@@ -67,8 +68,9 @@ def chat(request: ChatRequest) -> ChatResponse:
         result: dict[str, Any] = agent_graph.invoke(
             {"task": message, "iteration": 1},
         )
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Agent error: {exc}") from exc
+    except Exception as e:
+        print(f"CRITICAL BACKEND ERROR: {str(e)}")  # Print the actual error to the terminal
+        raise HTTPException(status_code=500, detail=f"Backend Agent Error: {str(e)}")
 
     response_text = result.get("result") or result.get("plan") or "No response generated."
     add_message(session_id, "assistant", response_text)
@@ -85,6 +87,18 @@ def chat(request: ChatRequest) -> ChatResponse:
 def get_roadmap() -> dict[str, Any]:
     """Read saved roadmaps from memory/roadmap.json."""
     return load_roadmaps()
+
+
+@api.delete("/api/roadmap")
+def delete_roadmap():
+    """safely clear or reset memory/roadmap.json and memory/schedule.json."""
+    try:
+        clear_roadmaps()
+        clear_schedule()
+        return {"status": "success", "message": "Roadmap and daily schedule cleared successfully"}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to clear roadmap: {exc}")
+
 
 
 @api.get("/api/tasks", response_model=TasksResponse)

@@ -266,11 +266,10 @@ export default function ChatBotUI() {
 
             {/* Input container with focus glow */}
             <div
-              className={`rounded-2xl border bg-slate-900/50 p-1 transition-all duration-300 backdrop-blur-md ${
-                isFocused
+              className={`rounded-2xl border bg-slate-900/50 p-1 transition-all duration-300 backdrop-blur-md ${isFocused
                   ? "border-cyan-neon/50 shadow-[0_0_20px_rgba(6,182,212,0.25),0_0_40px_rgba(139,92,246,0.08)]"
                   : "border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
-              }`}
+                }`}
             >
               <div className="flex items-end gap-2 rounded-xl bg-void/60 p-2">
                 <textarea
@@ -306,9 +305,8 @@ export default function ChatBotUI() {
                   ~{Math.ceil(charCount / 4)} tokens · Enter to send
                 </p>
                 <p
-                  className={`font-mono text-[0.65rem] ${
-                    nearLimit ? "text-amber-400" : "text-slate-500"
-                  }`}
+                  className={`font-mono text-[0.65rem] ${nearLimit ? "text-amber-400" : "text-slate-500"
+                    }`}
                 >
                   {charCount}/{MAX_CHARS}
                 </p>

@@ -7,6 +7,7 @@ import {
   RefreshCw,
   Sparkles,
   Target,
+  Trash2,
   Zap,
 } from "lucide-react";
 
@@ -15,6 +16,7 @@ import {
   DEFAULT_TASKS,
   fetchRoadmap,
   fetchTasks,
+  clearRoadmap,
 } from "../lib/api";
 
 function greeting() {
@@ -60,10 +62,22 @@ function SectionLabel({ icon: Icon, label }) {
   );
 }
 
+function cleanTaskKey(text) {
+  if (!text) return "";
+  return text.replace(/^[#\-\*\•\s]+/, "").trim();
+}
+
 export default function Dashboard() {
   const [tasks, setTasks] = useState(DEFAULT_TASKS);
   const [taskSource, setTaskSource] = useState("fallback");
-  const [done, setDone] = useState({});
+  const [done, setDone] = useState(() => {
+    try {
+      const saved = localStorage.getItem("completedTasks");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
   const [roadmap, setRoadmap] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -98,8 +112,8 @@ export default function Dashboard() {
   }, [loadData]);
 
   const completedCount = useMemo(
-    () => Object.values(done).filter(Boolean).length,
-    [done],
+    () => tasks.filter((task) => !!done[cleanTaskKey(task)]).length,
+    [tasks, done],
   );
 
   const progressPct = tasks.length
@@ -126,9 +140,36 @@ export default function Dashboard() {
   const upcomingReminder =
     timelineLines[0] ?? "Complete today's theory review before starting LeetCode problems.";
 
-  const toggleTask = (index) => {
-    setDone((prev) => ({ ...prev, [index]: !prev[index] }));
+  const toggleTask = (task) => {
+    const key = cleanTaskKey(task);
+    setDone((prev) => {
+      const next = { ...prev, [key]: !prev[key] };
+      localStorage.setItem("completedTasks", JSON.stringify(next));
+      return next;
+    });
   };
+
+  const handleClearRoadmap = async () => {
+    if (!window.confirm("Are you sure you want to clear your current learning roadmap and daily schedule? This action cannot be undone.")) {
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      await clearRoadmap();
+      setTasks([]);
+      setTaskSource("fallback");
+      setRoadmap(null);
+      localStorage.removeItem("completedTasks");
+      setDone({});
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to clear roadmap");
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-void text-slate-200">
@@ -143,10 +184,21 @@ export default function Dashboard() {
         <Card className="mb-6 overflow-hidden">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="space-y-3">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-neon/40 bg-cyan-neon/10 px-3 py-1 font-mono text-[0.65rem] uppercase tracking-wider text-cyan-neon">
-                <Zap className="h-3 w-3" />
-                Agentix OS · Online
-              </span>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-neon/40 bg-cyan-neon/10 px-3 py-1 font-mono text-[0.65rem] uppercase tracking-wider text-cyan-neon">
+                  <Zap className="h-3 w-3" />
+                  Agentix OS · Online
+                </span>
+                <button
+                  type="button"
+                  onClick={handleClearRoadmap}
+                  disabled={loading}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-red-500/20 bg-red-500/5 px-3 py-1 font-mono text-[0.65rem] uppercase tracking-wider text-red-400 hover:bg-red-500/10 shadow-[0_0_15px_rgba(239,68,68,0.1)] transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  <Trash2 className="h-3 w-3 text-red-400/80" />
+                  Clear Roadmap
+                </button>
+              </div>
               <h1 className="bg-gradient-to-r from-cyan-neon to-emerald-neon bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl">
                 {greeting()} Gauthami
               </h1>
@@ -216,12 +268,12 @@ export default function Dashboard() {
 
               <ul className="space-y-2">
                 {tasks.map((task, index) => {
-                  const checked = !!done[index];
+                  const checked = !!done[cleanTaskKey(task)];
                   return (
                     <li key={`${task}-${index}`}>
                       <button
                         type="button"
-                        onClick={() => toggleTask(index)}
+                        onClick={() => toggleTask(task)}
                         className={`group flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left transition ${
                           checked
                             ? "border-emerald-neon/40 bg-emerald-neon/5 shadow-[0_0_12px_rgba(16,185,129,0.12)]"

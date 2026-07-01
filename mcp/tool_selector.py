@@ -23,6 +23,9 @@ def select_tool(task):
     IMPORTANT:
     Return ONLY ONE EXACT tool name.
 
+    Guidelines:
+    - If the task is a variation of schedule generation or daily study planning (e.g., "Create today's schedule", "Generate today's tasks", "Today's study plan", "What should I study today?", "Schedule my roadmap", or "Run scheduler"), return 'daily_scheduler'.
+
     Example:
     leetcode_search
 
