@@ -43,9 +43,19 @@ class ChatResponse(BaseModel):
     status: Optional[str] = None
 
 
+class TaskItem(BaseModel):
+    task: str
+    completed: bool
+
+
 class TasksResponse(BaseModel):
-    tasks: list[str]
+    tasks: list[TaskItem]
     source: str
+
+
+class ToggleTaskRequest(BaseModel):
+    task: str
+    completed: bool
 
 
 @api.get("/api/health")
@@ -103,17 +113,55 @@ def delete_roadmap():
 
 @api.get("/api/tasks", response_model=TasksResponse)
 def get_tasks() -> TasksResponse:
-    """Fetch today's study tasks via daily_task_mcp."""
-    raw = today_tasks()
+    """Fetch today's study tasks and sync from roadmap if empty."""
+    from memory.schedule_manager import load_schedule, save_schedule
+    sched = load_schedule()
 
-    if isinstance(raw, list):
-        tasks = [line.strip("- ").strip() for line in raw if line.strip()]
-        return TasksResponse(tasks=tasks, source="roadmap")
+    # If today's list is empty, initialize it from raw today_tasks()
+    if not sched.get("today") or len(sched["today"]) == 0:
+        raw = today_tasks()
+        if isinstance(raw, list):
+            tasks_list = [line.strip("- ").strip() for line in raw if line.strip()]
+            sched["today"] = [{"task": t, "completed": False} for t in tasks_list]
+            save_schedule(sched)
+        elif isinstance(raw, str) and raw != "No roadmap found.":
+            sched["today"] = [{"task": raw, "completed": False}]
+            save_schedule(sched)
 
-    if isinstance(raw, str):
-        return TasksResponse(
-            tasks=[] if raw == "No roadmap found." else [raw],
-            source="fallback" if raw == "No roadmap found." else "roadmap",
-        )
+    tasks = [TaskItem(task=item["task"], completed=item["completed"]) for item in sched.get("today", [])]
+    source = "roadmap" if tasks else "fallback"
+    return TasksResponse(tasks=tasks, source=source)
 
-    return TasksResponse(tasks=[], source="fallback")
+
+@api.post("/api/tasks/toggle")
+def toggle_task_endpoint(req: ToggleTaskRequest) -> dict[str, Any]:
+    """Toggle task completion state on backend and return recalculated progress."""
+    try:
+        from memory.schedule_manager import toggle_task
+        from mcp.progress_mcp import update_progress
+        from memory.progress_manager import calculate_progress
+
+        # 1. Update schedule.json
+        toggle_task(req.task, req.completed)
+
+        # 2. Update progress.json
+        update_progress(req.task, req.completed)
+
+        # 3. Calculate and return updated progress metrics
+        progress_data = calculate_progress()
+        return {
+            "status": "success",
+            "progress": progress_data
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=550, detail=f"Failed to toggle task: {exc}")
+
+
+@api.get("/api/progress")
+def get_progress_endpoint() -> dict[str, Any]:
+    """Fetch recalculated progress details."""
+    try:
+        from memory.progress_manager import calculate_progress
+        return calculate_progress()
+    except Exception as exc:
+        raise HTTPException(status_code=550, detail=f"Failed to fetch progress: {exc}")

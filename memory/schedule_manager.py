@@ -51,8 +51,35 @@ def complete_task(index):
         save_schedule(data)
 
 
+def toggle_task(task_name, completed):
+    data = load_schedule()
+    target = task_name.strip()
+    updated = False
+    
+    import re
+    def clean_t(name):
+        return re.sub(r'^[-*+•\s]+', '', name).strip()
+        
+    clean_target = clean_t(target)
+    
+    for item in data.setdefault("today", []):
+        if clean_t(item.get("task", "")) == clean_target:
+            item["completed"] = completed
+            updated = True
+            
+    if not updated:
+        data["today"].append({"task": target, "completed": completed})
+        
+    save_schedule(data)
+
+
 def clear_schedule():
     save_schedule({
         "today": [],
         "tomorrow": []
     })
+    try:
+        from memory.progress_manager import reset_progress
+        reset_progress()
+    except Exception as e:
+        print(f"Error resetting progress on clear schedule: {e}")

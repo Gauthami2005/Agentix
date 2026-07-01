@@ -23,6 +23,18 @@ export function clearRoadmap() {
   });
 }
 
+export function fetchProgress() {
+  return request(`/api/progress?_t=${Date.now()}`);
+}
+
+export function toggleTask(task, completed) {
+  return request("/api/tasks/toggle", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ task, completed }),
+  });
+}
+
 
 export function sendChat(message, sessionId) {
   return request("/api/chat", {

@@ -28,16 +28,14 @@ export default function Sidebar({ view, setView, views }) {
                 key={id}
                 type="button"
                 onClick={() => setView(id)}
-                className={`group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition duration-200 border ${
-                  isActive
+                className={`group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition duration-200 border ${isActive
                     ? "border-cyan-neon/35 bg-cyan-neon/10 text-cyan-neon shadow-[0_0_15px_rgba(6,182,212,0.15)]"
                     : "border-transparent text-slate-400 hover:bg-slate-900/60 hover:text-slate-200 hover:border-slate-800/40"
-                }`}
+                  }`}
               >
                 <Icon
-                  className={`h-4.5 w-4.5 transition duration-200 ${
-                    isActive ? "text-cyan-neon scale-110" : "text-slate-400 group-hover:text-slate-200"
-                  }`}
+                  className={`h-4.5 w-4.5 transition duration-200 ${isActive ? "text-cyan-neon scale-110" : "text-slate-400 group-hover:text-slate-200"
+                    }`}
                 />
                 <span>{label}</span>
               </button>

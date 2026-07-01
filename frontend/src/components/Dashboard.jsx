@@ -18,6 +18,8 @@ import {
   fetchRoadmap,
   fetchTasks,
   clearRoadmap,
+  fetchProgress,
+  toggleTask,
 } from "../lib/api";
 
 function greeting() {
@@ -68,17 +70,20 @@ function cleanTaskKey(text) {
   return text.replace(/^[#\-\*\•\s]+/, "").trim();
 }
 
-export default function Dashboard() {
+export default function Dashboard({ isDarkMode, setIsDarkMode }) {
   const [roadmaps, setRoadmaps] = useState([]);
   const [activeRoadmapId, setActiveRoadmapId] = useState("");
-  const [taskSource, setTaskSource] = useState("fallback");
-  const [done, setDone] = useState(() => {
-    try {
-      const saved = localStorage.getItem("completedTasks");
-      return saved ? JSON.parse(saved) : {};
-    } catch {
-      return {};
-    }
+  const [tasks, setTasks] = useState([]);
+  const [progress, setProgress] = useState({
+    completed_tasks: 0,
+    total_tasks: 0,
+    overall_progress: 0,
+    topics: [
+      { name: "Arrays", completed: false },
+      { name: "Strings", completed: false },
+      { name: "Trees", completed: false },
+      { name: "Graphs", completed: false },
+    ],
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -88,29 +93,22 @@ export default function Dashboard() {
   }, [roadmaps, activeRoadmapId]);
 
   const activeTasks = useMemo(() => {
-    if (!activeRoadmap?.roadmap) return DEFAULT_TASKS;
-    const lines = activeRoadmap.roadmap.split("\n");
-    const parsedTasks = [];
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (trimmed.startsWith("-") || trimmed.startsWith("*") || trimmed.startsWith("+")) {
-        const cleaned = trimmed.replace(/^[-*+•\s]+/, "").trim();
-        if (cleaned) {
-          parsedTasks.push(cleaned);
-        }
-      }
-      if (parsedTasks.length === 5) {
-        break;
-      }
-    }
-    return parsedTasks.length > 0 ? parsedTasks : DEFAULT_TASKS;
-  }, [activeRoadmap]);
+    if (tasks.length > 0) return tasks;
+    return DEFAULT_TASKS.map((t) => ({ task: t, completed: false }));
+  }, [tasks]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const [tasksRes, roadmapRes] = await Promise.all([fetchTasks(), fetchRoadmap()]);
+      const [tasksRes, roadmapRes, progressRes] = await Promise.all([
+        fetchTasks(),
+        fetchRoadmap(),
+        fetchProgress(),
+      ]);
+
+      setTasks(tasksRes.tasks || []);
+      setProgress(progressRes);
 
       const entries = roadmapRes.roadmaps ?? [];
       setRoadmaps(entries);
@@ -120,16 +118,13 @@ export default function Dashboard() {
           const exists = entries.some((r) => r.id === prev);
           return exists && prev ? prev : entries[entries.length - 1].id;
         });
-        setTaskSource("roadmap");
       } else {
         setActiveRoadmapId("");
-        setTaskSource("fallback");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load dashboard data");
       setRoadmaps([]);
       setActiveRoadmapId("");
-      setTaskSource("fallback");
     } finally {
       setLoading(false);
     }
@@ -139,14 +134,8 @@ export default function Dashboard() {
     loadData();
   }, [loadData]);
 
-  const completedCount = useMemo(
-    () => activeTasks.filter((task) => !!done[cleanTaskKey(task)]).length,
-    [activeTasks, done],
-  );
-
-  const progressPct = activeTasks.length
-    ? Math.round((completedCount / activeTasks.length) * 100)
-    : 0;
+  const completedCount = progress.completed_tasks;
+  const progressPct = progress.overall_progress;
 
   const targetGoal = activeRoadmap?.title ?? "DSA Interview Ready — 3 Month Sprint";
 
@@ -168,13 +157,17 @@ export default function Dashboard() {
   const upcomingReminder =
     timelineLines[0] ?? "Complete today's theory review before starting LeetCode problems.";
 
-  const toggleTask = (task) => {
-    const key = cleanTaskKey(task);
-    setDone((prev) => {
-      const next = { ...prev, [key]: !prev[key] };
-      localStorage.setItem("completedTasks", JSON.stringify(next));
-      return next;
-    });
+  const handleToggleTask = async (taskName, currentCompleted) => {
+    try {
+      const result = await toggleTask(taskName, currentCompleted);
+      if (result.status === "success") {
+        setProgress(result.progress);
+        const tasksRes = await fetchTasks();
+        setTasks(tasksRes.tasks || []);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to toggle task status");
+    }
   };
 
   const handleClearRoadmap = async () => {
@@ -188,9 +181,18 @@ export default function Dashboard() {
       await clearRoadmap();
       setRoadmaps([]);
       setActiveRoadmapId("");
-      setTaskSource("fallback");
-      localStorage.removeItem("completedTasks");
-      setDone({});
+      setTasks([]);
+      setProgress({
+        completed_tasks: 0,
+        total_tasks: 0,
+        overall_progress: 0,
+        topics: [
+          { name: "Arrays", completed: false },
+          { name: "Strings", completed: false },
+          { name: "Trees", completed: false },
+          { name: "Graphs", completed: false },
+        ],
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to clear roadmap");
     } finally {
@@ -198,110 +200,46 @@ export default function Dashboard() {
     }
   };
 
-
   return (
-    <div className="min-h-screen bg-void text-slate-200">
-      {/* Ambient background */}
-      <div
-        className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(6,182,212,0.08),transparent),radial-gradient(ellipse_60%_40%_at_100%_100%,rgba(16,185,129,0.06),transparent)]"
-        aria-hidden
-      />
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-[#030303] text-white" : "bg-[#fcfcfc] text-zinc-900"}`}>
+      <button
+        type="button"
+        onClick={() => setIsDarkMode(!isDarkMode)}
+        className={`absolute top-8 right-8 z-50 p-2.5 rounded-lg border transition-all duration-300 cursor-pointer ${
+          isDarkMode
+            ? "border-zinc-800 bg-[#0c0c0e]/80 text-cyan-400 hover:border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)]"
+            : "border-zinc-200 bg-white text-cyan-600 hover:border-cyan-400 shadow-[0_4_12px_rgba(0,0,0,0.03)]"
+        }`}
+        aria-label="Toggle theme"
+      >
+        {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      </button>
 
-      <div className="relative mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Header card */}
-        <Card className="mb-6 overflow-hidden">
-          <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-            <div className="space-y-3">
-              <div className="flex flex-wrap items-center gap-2.5">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-neon/40 bg-cyan-neon/10 px-3 py-1 font-mono text-[0.65rem] uppercase tracking-wider text-cyan-neon">
-                  <Zap className="h-3 w-3" />
-                  Agentix OS · Online
-                </span>
-                <button
-                  type="button"
-                  onClick={handleClearRoadmap}
-                  disabled={loading}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-red-500/20 bg-red-500/5 px-3 py-1 font-mono text-[0.65rem] uppercase tracking-wider text-red-400 hover:bg-red-500/10 shadow-[0_0_15px_rgba(239,68,68,0.1)] transition-all disabled:opacity-50 cursor-pointer"
-                >
-                  <Trash2 className="h-3 w-3 text-red-400/80" />
-                  Clear Roadmap
-                </button>
-              </div>
-              <h1 className="bg-gradient-to-r from-cyan-neon to-emerald-neon bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl">
-                {greeting()} Gauthami
-              </h1>
-              <p className="text-sm text-slate-400">
-                LangGraph + MCP agent ready · {formatDate()}
-              </p>
-              {roadmaps.length > 0 && (
-                <div className="relative mt-3 inline-block w-full max-w-xs">
-                  <select
-                    value={activeRoadmapId}
-                    onChange={(e) => setActiveRoadmapId(e.target.value)}
-                    className="w-full appearance-none rounded-xl border border-cyan-neon/30 bg-slate-900/80 px-4 py-2 pr-10 text-xs font-semibold text-slate-200 shadow-[0_0_15px_rgba(6,182,212,0.05)] transition-all hover:border-cyan-neon/60 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] focus:border-cyan-neon focus:outline-none focus:shadow-[0_0_15px_rgba(6,182,212,0.2)] cursor-pointer"
-                  >
-                    {roadmaps.map((r) => (
-                      <option key={r.id} value={r.id} className="bg-slate-950 text-slate-200">
-                        {r.title}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-cyan-neon">
-                    <ChevronDown className="h-4 w-4" />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-6">
-              <ProgressRing percent={progressPct} />
-
-              <div className="flex flex-col gap-3">
-                <div className="rounded-xl border border-emerald-neon/35 bg-surface/80 px-5 py-3 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
-                  <p className="font-mono text-[0.6rem] uppercase tracking-widest text-slate-400">
-                    Study Streak
-                  </p>
-                  <p className="mt-1 flex items-center gap-2 text-2xl font-bold text-emerald-neon">
-                    <Flame className="h-6 w-6 text-orange-400" />
-                    7 days
-                  </p>
-                </div>
-                <div className="rounded-xl border border-cyan-neon/35 bg-surface/80 px-5 py-3 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
-                  <p className="font-mono text-[0.6rem] uppercase tracking-widest text-slate-400">
-                    Target Goal
-                  </p>
-                  <p className="mt-1 flex items-start gap-2 text-sm font-medium leading-snug text-slate-200">
-                    <Target className="mt-0.5 h-4 w-4 shrink-0 text-cyan-neon" />
-                    <span className="line-clamp-2">{targetGoal}</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
-
+      <div className="relative mx-auto max-w-6xl px-6 py-12 sm:px-8 lg:px-12">
         {error && (
-          <div className="mb-4 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-            API offline — showing defaults. ({error})
+          <div className={`mb-6 rounded-lg border px-4 py-3 text-sm ${
+            isDarkMode ? "border-amber-500/20 bg-amber-500/5 text-amber-300" : "border-amber-300 bg-amber-50 text-amber-800"
+          }`}>
+            System online with fallback defaults. ({error})
           </div>
         )}
 
-        {/* Two-column hub */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Today's Tasks */}
-          <div>
-            <SectionLabel icon={Sparkles} label="Today's Tasks" />
-            <Card>
-              <div className="mb-4 flex items-center justify-between">
-                <p className="text-xs text-slate-400">
-                  {completedCount}/{activeTasks.length} completed
-                  {taskSource === "roadmap" ? " · synced from roadmap" : " · default queue"}
-                </p>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-16 items-start">
+          <div className="space-y-8">
+            <div className={`flex items-center justify-between pb-4 border-b ${
+              isDarkMode ? "border-zinc-800/80" : "border-zinc-200"
+            }`}>
+              <span className={`font-mono text-xs tracking-widest uppercase font-semibold ${isDarkMode ? "text-zinc-400" : "text-zinc-500"}`}>
+                Today's Timeline ({completedCount}/{activeTasks.length})
+              </span>
+              <div className="flex items-center gap-4">
                 <button
                   type="button"
                   onClick={loadData}
                   disabled={loading}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-neon/40 bg-cyan-neon/10 px-3 py-1.5 text-xs font-medium text-cyan-neon transition hover:border-emerald-neon/50 hover:bg-cyan-neon/20 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] disabled:opacity-50"
+                  className={`flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                    isDarkMode ? "text-zinc-400 hover:text-cyan-400" : "text-zinc-500 hover:text-cyan-600"
+                  } disabled:opacity-40`}
                 >
                   {loading ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -310,75 +248,232 @@ export default function Dashboard() {
                   )}
                   Refresh
                 </button>
-              </div>
 
-              <ul className="space-y-2">
-                {activeTasks.map((task, index) => {
-                  const checked = !!done[cleanTaskKey(task)];
+                <button
+                  type="button"
+                  onClick={handleClearRoadmap}
+                  disabled={loading}
+                  className={`flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                    isDarkMode ? "text-zinc-500 hover:text-red-400" : "text-zinc-400 hover:text-red-600"
+                  } disabled:opacity-40`}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Clear Roadmap
+                </button>
+              </div>
+            </div>
+
+            <div className="relative pl-6">
+              <ul className="space-y-0 relative">
+                {activeTasks.map((taskItem, index) => {
+                  const taskText = typeof taskItem === "string" ? taskItem : taskItem.task;
+                  const checked = typeof taskItem === "string" ? false : taskItem.completed;
                   return (
-                    <li key={`${task}-${index}`}>
+                    <li key={`${taskText}-${index}`} className="group/item relative pb-8 flex items-start gap-4">
+                      {index < activeTasks.length - 1 && (
+                        <div
+                          className={`absolute left-[7px] top-5 bottom-0 w-[2px] transition-all duration-300 ${
+                            isDarkMode
+                              ? "bg-zinc-800 group-hover/item:bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.2)]"
+                              : "bg-zinc-200 group-hover/item:bg-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.1)]"
+                          }`}
+                        />
+                      )}
+
                       <button
                         type="button"
-                        onClick={() => toggleTask(task)}
-                        className={`group flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left transition ${
+                        onClick={() => handleToggleTask(taskText, checked)}
+                        className={`z-10 mt-1 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border bg-transparent transition-all duration-300 cursor-pointer ${
                           checked
-                            ? "border-emerald-neon/40 bg-emerald-neon/5 shadow-[0_0_12px_rgba(16,185,129,0.12)]"
-                            : "border-cyan-neon/20 bg-void/40 hover:border-cyan-neon/40 hover:shadow-[0_0_12px_rgba(6,182,212,0.1)]"
-                        }`}
+                            ? "border-emerald-500 hover:border-emerald-400 bg-emerald-500/10"
+                            : "border-zinc-700 hover:border-emerald-500"
+                        } group-hover/item:border-cyan-400 group-hover/item:shadow-[0_0_12px_rgba(6,182,212,0.5)]`}
                       >
-                        {checked ? (
-                          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-neon" />
-                        ) : (
-                          <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-500 group-hover:text-cyan-neon" />
+                        {checked && (
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                         )}
-                        <span
-                          className={`text-sm leading-relaxed ${
-                            checked ? "text-slate-400 line-through" : "text-slate-200"
-                          }`}
-                        >
-                          {task}
-                        </span>
                       </button>
+
+                      <div className="flex-1 min-w-0">
+                        <span
+                          onClick={() => handleToggleTask(taskText, checked)}
+                          className={`text-sm leading-relaxed transition-all cursor-pointer font-medium ${
+                            checked
+                              ? isDarkMode
+                                ? "text-zinc-500 line-through"
+                                : "text-zinc-400 line-through"
+                              : isDarkMode
+                              ? "text-zinc-200 hover:text-white"
+                              : "text-zinc-800 hover:text-zinc-950"
+                          } group-hover/item:translate-x-1 duration-200 block`}
+                        >
+                          {taskText}
+                        </span>
+                      </div>
                     </li>
                   );
                 })}
               </ul>
-            </Card>
+            </div>
+
+            <div className={`mt-12 pt-8 border-t ${isDarkMode ? "border-zinc-800/80" : "border-zinc-200"}`}>
+              <p className={`font-mono text-xs tracking-widest uppercase font-semibold mb-6 ${isDarkMode ? "text-zinc-400" : "text-zinc-500"}`}>
+                Topic Progress Roadmap
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                {progress.topics && progress.topics.map((topic) => {
+                  let icon = "❌";
+                  let statusText = "Pending";
+                  let colorClass = "text-zinc-500";
+                  if (topic.completed) {
+                    icon = "✔";
+                    statusText = "Completed";
+                    colorClass = "text-emerald-500 font-bold";
+                  } else {
+                    const isDP = topic.name.toLowerCase() === "graphs" || topic.name.toLowerCase() === "trees";
+                    if (progress.completed_tasks > 0 && isDP) {
+                      icon = "⏳";
+                      statusText = "In Progress";
+                      colorClass = "text-cyan-400";
+                    }
+                  }
+
+                  return (
+                    <div key={topic.name} className="flex flex-col gap-1.5">
+                      <span className={`text-sm font-mono uppercase tracking-wider ${isDarkMode ? "text-zinc-500" : "text-zinc-400"}`}>
+                        {topic.name}
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm">{icon}</span>
+                        <span className={`text-xs font-semibold ${colorClass}`}>{statusText}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
-          {/* Roadmap timeline + reminder */}
-          <div>
-            <SectionLabel icon={Target} label="Roadmap Timeline" />
-            <Card glow="emerald" className="mb-4">
-              {timelineLines.length > 0 ? (
+          <div className="space-y-10">
+            <div>
+              <p className={`font-mono text-xs tracking-widest uppercase font-semibold ${isDarkMode ? "text-zinc-500" : "text-zinc-400"}`}>
+                {formatDate()}
+              </p>
+              <h1 className={`text-5xl font-black tracking-tighter mt-2 leading-none ${isDarkMode ? "text-white" : "text-zinc-900"}`}>
+                {greeting()}<br />Gauthami
+              </h1>
+              <p className={`text-xs mt-3 font-mono ${isDarkMode ? "text-zinc-400" : "text-zinc-500"}`}>
+                Agentix OS v1.0.0 · Core Node Online
+              </p>
+            </div>
+
+            {roadmaps.length > 0 && (
+              <div className="relative w-full">
+                <p className={`font-mono text-[10px] tracking-widest uppercase mb-2 ${isDarkMode ? "text-zinc-500" : "text-zinc-400"}`}>
+                  Active Roadmap File
+                </p>
+                <div className="relative">
+                  <select
+                    value={activeRoadmapId}
+                    onChange={(e) => setActiveRoadmapId(e.target.value)}
+                    className={`w-full appearance-none rounded-lg border px-4 py-2.5 pr-10 text-xs font-semibold cursor-pointer transition-all duration-300 ${
+                      isDarkMode
+                        ? "border-zinc-800 bg-[#0c0c0e]/80 text-zinc-200 hover:border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.1)] focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(6,182,212,0.25)]"
+                        : "border-zinc-200 bg-white text-zinc-800 hover:border-cyan-400 shadow-[0_4_12px_rgba(0,0,0,0.02)] focus:border-cyan-400 focus:shadow-[0_4_12px_rgba(0,0,0,0.04)]"
+                    }`}
+                  >
+                    {roadmaps.map((r) => (
+                      <option key={r.id} value={r.id} className={isDarkMode ? "bg-zinc-950 text-slate-200" : "bg-white text-zinc-800"}>
+                        {r.title}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-cyan-400">
+                    <ChevronDown className="h-4 w-4" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className={`space-y-6 pt-6 border-t ${isDarkMode ? "border-zinc-800/80" : "border-zinc-200"}`}>
+              <p className={`font-mono text-[10px] tracking-widest uppercase ${isDarkMode ? "text-zinc-500" : "text-zinc-400"}`}>
+                Performance Stats
+              </p>
+
+              <div className="flex justify-between items-center">
+                <span className={`text-xs font-mono uppercase tracking-wider ${isDarkMode ? "text-zinc-400" : "text-zinc-500"}`}>
+                  Solved Today
+                </span>
+                <span className={`text-sm font-bold ${isDarkMode ? "text-white" : "text-zinc-900"}`}>
+                  {completedCount} Tasks
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center border-t border-dashed border-zinc-800/40 pt-4">
+                <span className={`text-xs font-mono uppercase tracking-wider ${isDarkMode ? "text-zinc-400" : "text-zinc-500"}`}>
+                  Current Topic
+                </span>
+                <span className={`text-sm font-bold ${isDarkMode ? "text-cyan-400" : "text-cyan-600"}`}>
+                  {targetGoal}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center border-t border-dashed border-zinc-800/40 pt-4">
+                <span className={`text-xs font-mono uppercase tracking-wider ${isDarkMode ? "text-zinc-400" : "text-zinc-500"}`}>
+                  Completion
+                </span>
+                <span className={`text-sm font-bold ${isDarkMode ? "text-emerald-400" : "text-emerald-600"}`}>
+                  {progressPct}% ({completedCount} / {progress.total_tasks} Tasks)
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center border-t border-dashed border-zinc-800/40 pt-4">
+                <span className={`text-xs font-mono uppercase tracking-wider ${isDarkMode ? "text-zinc-400" : "text-zinc-500"}`}>
+                  Longest Streak
+                </span>
+                <span className="text-sm font-bold text-orange-500">
+                  12 Days
+                </span>
+              </div>
+            </div>
+
+            {timelineLines.length > 0 && (
+              <div className={`pt-6 border-t ${isDarkMode ? "border-zinc-800/80" : "border-zinc-200"}`}>
+                <p className={`font-mono text-[10px] tracking-widest uppercase mb-4 ${isDarkMode ? "text-zinc-500" : "text-zinc-400"}`}>
+                  Roadmap Timeline
+                </p>
                 <ol className="space-y-4">
                   {timelineLines.map((line, i) => (
-                    <li key={line} className="relative border-l-2 border-cyan-neon/30 pl-4">
+                    <li key={line} className={`relative border-l pl-4 py-0.5 ${isDarkMode ? "border-zinc-800" : "border-zinc-200"}`}>
                       <span
-                        className={`absolute -left-[5px] top-1.5 h-2 w-2 rounded-full ${
-                          i === 0 ? "bg-emerald-neon shadow-[0_0_8px_rgba(16,185,129,0.7)]" : "bg-cyan-neon/60"
+                        className={`absolute -left-[4.5px] top-2 h-2.5 w-2.5 rounded-full border transition-all duration-300 ${
+                          i === 0
+                            ? "bg-emerald-500 border-emerald-400 shadow-[0_0_8px_rgba(34,197,94,0.6)]"
+                            : isDarkMode
+                            ? "bg-zinc-950 border-zinc-850"
+                            : "bg-white border-zinc-300"
                         }`}
                       />
-                      <p className="text-sm leading-relaxed text-slate-300">{line}</p>
+                      <p className={`text-xs leading-relaxed font-medium ${isDarkMode ? "text-zinc-300" : "text-zinc-700"}`}>
+                        {line}
+                      </p>
                     </li>
                   ))}
                 </ol>
-              ) : (
-                <p className="text-sm text-slate-400">
-                  No roadmap saved yet. Ask the AI agent to generate one via{" "}
-                  <code className="rounded bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-cyan-neon">
-                    POST /api/chat
-                  </code>
-                  .
-                </p>
-              )}
-            </Card>
+              </div>
+            )}
 
-            <div className="rounded-2xl border border-emerald-neon/40 bg-emerald-neon/5 p-5 shadow-[0_0_15px_rgba(16,185,129,0.18)]">
-              <p className="font-mono text-[0.65rem] uppercase tracking-[0.12em] text-emerald-neon">
+            <div className={`p-5 rounded-lg border transition-all duration-300 ${
+              isDarkMode
+                ? "border-zinc-850 bg-[#0c0c0e]/80 text-zinc-300 shadow-[0_0_15px_rgba(34,197,94,0.02)]"
+                : "border-zinc-200 bg-zinc-50/50 text-zinc-700 shadow-[0_4_12px_rgba(0,0,0,0.01)]"
+            }`}>
+              <p className={`font-mono text-[9px] tracking-widest uppercase font-semibold ${isDarkMode ? "text-emerald-400" : "text-emerald-600"}`}>
                 Upcoming Reminder
               </p>
-              <p className="mt-2 text-sm leading-relaxed text-slate-200">{upcomingReminder}</p>
+              <p className="mt-2 text-xs leading-relaxed font-medium">
+                {upcomingReminder}
+              </p>
             </div>
           </div>
         </div>
