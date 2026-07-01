@@ -14,13 +14,22 @@ const VIEWS = [
 
 function App() {
   const [view, setView] = useState("dashboard");
+  const [hasNewRoadmapNotification, setHasNewRoadmapNotification] = useState(false);
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-void">
-      <Sidebar view={view} setView={setView} views={VIEWS} />
+      <Sidebar
+        view={view}
+        setView={setView}
+        views={VIEWS}
+        hasNewRoadmapNotification={hasNewRoadmapNotification}
+        setHasNewRoadmapNotification={setHasNewRoadmapNotification}
+      />
       <main className="flex-1 h-full overflow-y-auto min-w-0">
-        {view === "dashboard" && <Dashboard />}
-        {view === "chat" && <ChatBotUI />}
+        {view === "dashboard" && <Dashboard setView={setView} />}
+        {view === "chat" && (
+          <ChatBotUI setHasNewRoadmapNotification={setHasNewRoadmapNotification} />
+        )}
         {view === "roadmaps" && <Roadmaps />}
       </main>
     </div>

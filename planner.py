@@ -19,28 +19,55 @@ def planner_node(state):
     task = state["task"]
 
     prompt = f"""
-You are an expert AI Study Planner.
+You are an expert AI Study Planner. Parse the user's intent and extract a standardized, professional curriculum structure.
+Create a detailed, clean study roadmap for the following goal:
 
-Create a detailed roadmap for the following goal:
+Goal: {task}
 
-{task}
+You MUST respond using a strict JSON schema and nothing else.
+Strict JSON Schema:
+{{
+  "roadmap_title": "string (e.g., 'Dynamic Programming Mastery')",
+  "duration": "string (e.g., '30 Days')",
+  "phases": [
+    {{
+      "phase_title": "string (e.g., 'Phase 1: Foundations')",
+      "description": "string (brief summary of this phase's goals)",
+      "core_topics": [
+        "string (topic 1, e.g., 'Memoization vs Tabulation')",
+        "string (topic 2, e.g., '1D DP Basics')"
+      ]
+    }}
+  ]
+}}
 
-The roadmap should include:
-- Weekly breakdown
-- Topics to study
-- Recommended practice
-- Revision plan
-- Interview preparation tips
-
-Make the roadmap clear and structured using headings and bullet points.
+Rules:
+Strip out any conversational filler, introductory remarks, markdown formatting symbols, or chat history. Output only the pure structured JSON metadata. Ensure it is valid, parseable JSON.
 """
 
     response = llm.invoke(prompt)
+    content = response.content.strip()
 
-    roadmap = response.content
+    # Clean the output to ensure valid JSON is parsed
+    import re
+    if "```" in content:
+        match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', content)
+        if match:
+            content = match.group(1).strip()
 
-    # Save roadmap for later use
-    save_roadmap(task, roadmap)
+    roadmap = content
+
+    # Save roadmap for later use with extracted title
+    title = task
+    try:
+        import json
+        parsed_data = json.loads(roadmap)
+        if isinstance(parsed_data, dict) and "roadmap_title" in parsed_data:
+            title = parsed_data["roadmap_title"]
+    except Exception:
+        pass
+
+    save_roadmap(title, roadmap)
 
     return {
         "plan": roadmap

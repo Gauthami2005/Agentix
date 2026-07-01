@@ -1,0 +1,24 @@
+{
+    "completed_tasks": 0,
+    "total_tasks": 5,
+    "completed_task_names": [],
+    "topics": [
+        {
+            "name": "Arrays",
+            "completed": false
+        },
+        {
+            "name": "Strings",
+            "completed": false
+        },
+        {
+            "name": "Trees",
+            "completed": false
+        },
+        {
+            "name": "Graphs",
+            "completed": false
+        }
+    ],
+    "overall_progress": 0
+}

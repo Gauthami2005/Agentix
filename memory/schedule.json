@@ -1,4 +1,30 @@
 {
-    "today": [],
-    "tomorrow": []
+    "today": [
+        {
+            "task": "{",
+            "completed": false
+        },
+        {
+            "task": "\"roadmap_title\": \"Cracking FAANG Technical Interviews in 3 Months\",",
+            "completed": false
+        },
+        {
+            "task": "\"duration\": \"3 Months\",",
+            "completed": false
+        }
+    ],
+    "tomorrow": [
+        {
+            "task": "\"phases\": [",
+            "completed": false
+        },
+        {
+            "task": "{",
+            "completed": false
+        },
+        {
+            "task": "\"phase_title\": \"Phase 1: Data Structures and Algorithms Fundamentals\",",
+            "completed": false
+        }
+    ]
 }

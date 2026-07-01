@@ -38,7 +38,8 @@ def save_roadmap(title, roadmap):
         "id": str(uuid.uuid4()),
         "title": title,
         "roadmap": roadmap,
-        "completed_days": []
+        "completed_days": [],
+        "completed_topics": []
     })
     save_roadmaps(data)
 
@@ -53,6 +54,35 @@ def get_latest_roadmap():
     if isinstance(latest, dict):
         return latest.get("roadmap")
     return None
+
+
+def toggle_roadmap_topic(roadmap_id: str, phase_title: str, topic_name: str, completed: bool) -> dict:
+    """Toggle a specific topic's completion inside a saved roadmap."""
+    data = load_roadmaps()
+    target_rm = None
+    for rm in data.get("roadmaps", []):
+        if rm["id"] == roadmap_id:
+            target_rm = rm
+            break
+
+    if not target_rm and data.get("roadmaps", []):
+        # fallback to the latest
+        target_rm = data["roadmaps"][-1]
+
+    if target_rm:
+        if "completed_topics" not in target_rm:
+            target_rm["completed_topics"] = []
+
+        if completed:
+            if topic_name not in target_rm["completed_topics"]:
+                target_rm["completed_topics"].append(topic_name)
+        else:
+            if topic_name in target_rm["completed_topics"]:
+                target_rm["completed_topics"].remove(topic_name)
+
+        save_roadmaps(data)
+        return target_rm
+    return {}
 
 
 def clear_roadmaps():

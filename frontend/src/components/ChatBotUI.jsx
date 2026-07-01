@@ -15,6 +15,19 @@ import {
 
 import { sendMessageToAgent } from "../lib/api";
 
+function tryParseRoadmap(roadmapStr) {
+  if (!roadmapStr) return null;
+  try {
+    const data = JSON.parse(roadmapStr);
+    if (data && data.roadmap_title && data.phases) {
+      return data;
+    }
+  } catch (e) {
+    // ignore
+  }
+  return null;
+}
+
 const QUICK_PROMPTS = [
   "Create a 30-day roadmap to master Dynamic Programming from scratch",
   "Give me a roadmap to learn System Design for beginner developers",
@@ -72,6 +85,8 @@ function UserBubble({ message }) {
 }
 
 function AgentBubble({ message }) {
+  const parsedRoadmap = tryParseRoadmap(message.text);
+
   return (
     <div className="flex gap-3">
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-emerald-neon/30 bg-teal-950/80 shadow-[0_0_10px_rgba(16,185,129,0.15)]">
@@ -83,9 +98,28 @@ function AgentBubble({ message }) {
             className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-cyan-neon to-emerald-neon shadow-[0_0_8px_rgba(6,182,212,0.6)]"
             aria-hidden
           />
-          <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200">
-            {message.text}
-          </p>
+          {parsedRoadmap ? (
+            <div className="space-y-3">
+              <h3 className="text-sm font-bold text-cyan-neon flex items-center gap-1.5">
+                🗺️ {parsedRoadmap.roadmap_title} ({parsedRoadmap.duration})
+              </h3>
+              <p className="text-xs text-slate-400">
+                Roadmap created successfully! Head over to the Roadmaps tab to view details and check off topics.
+              </p>
+              <div className="space-y-2 border-t border-slate-800 pt-2.5">
+                {parsedRoadmap.phases.map((phase, idx) => (
+                  <div key={idx} className="text-xs space-y-1">
+                    <p className="font-bold text-emerald-neon">{phase.phase_title}</p>
+                    {phase.description && <p className="text-slate-300 ml-2">{phase.description}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200">
+              {message.text}
+            </p>
+          )}
         </div>
         <p className="mt-1.5 font-mono text-[0.65rem] text-slate-500">
           Agentix · {formatTime(message.timestamp)}
@@ -110,13 +144,14 @@ function TypingIndicator() {
   );
 }
 
-export default function ChatBotUI() {
+export default function ChatBotUI({ setHasNewRoadmapNotification }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [sessionId, setSessionId] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [error, setError] = useState(null);
+  const [chatMode, setChatMode] = useState("general_chat");
 
   const scrollAnchorRef = useRef(null);
   const textareaRef = useRef(null);
@@ -151,9 +186,14 @@ export default function ChatBotUI() {
         const { reply, sessionId: nextSessionId } = await sendMessageToAgent(
           trimmed,
           sessionId,
+          chatMode,
         );
 
         setSessionId(nextSessionId);
+
+        if (chatMode === "generate_roadmap" && setHasNewRoadmapNotification) {
+          setHasNewRoadmapNotification(true);
+        }
 
         const agentMessage = {
           id: createId(),
@@ -180,7 +220,7 @@ export default function ChatBotUI() {
         textareaRef.current?.focus();
       }
     },
-    [isLoading, sessionId],
+    [isLoading, sessionId, chatMode],
   );
 
   const handleSubmit = (e) => {
@@ -262,6 +302,32 @@ export default function ChatBotUI() {
                   {prompt}
                 </button>
               ))}
+            </div>
+
+            {/* Mode selection bar */}
+            <div className="mb-3 flex gap-2">
+              <button
+                type="button"
+                onClick={() => setChatMode("general_chat")}
+                className={`rounded-lg border px-4.5 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                  chatMode === "general_chat"
+                    ? "border-cyan-neon/30 bg-slate-900/60 text-cyan-neon shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+                    : "border-slate-800 bg-slate-900/40 text-slate-400 hover:border-slate-700 hover:text-slate-200"
+                }`}
+              >
+                💬 General Chat
+              </button>
+              <button
+                type="button"
+                onClick={() => setChatMode("generate_roadmap")}
+                className={`rounded-lg border px-4.5 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                  chatMode === "generate_roadmap"
+                    ? "border-cyan-neon/30 bg-slate-900/60 text-cyan-neon shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+                    : "border-slate-800 bg-slate-900/40 text-slate-400 hover:border-slate-700 hover:text-slate-200"
+                }`}
+              >
+                🗺️ Build Roadmap
+              </button>
             </div>
 
             {/* Input container with focus glow */}

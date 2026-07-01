@@ -34,6 +34,7 @@ api.add_middleware(
 class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, description="User message for the agent")
     session_id: Optional[str] = Field(default=None, description="Existing chat session ID")
+    chatMode: str = Field(default="general_chat", description="Chat mode")
 
 
 class ChatResponse(BaseModel):
@@ -50,11 +51,24 @@ class TaskItem(BaseModel):
 
 class TasksResponse(BaseModel):
     tasks: list[TaskItem]
+    tomorrow: list[TaskItem] = []
     source: str
 
 
 class ToggleTaskRequest(BaseModel):
     task: str
+    completed: bool
+
+
+class CompleteTaskRequest(BaseModel):
+    task_name: str
+    completed: bool
+
+
+class CompleteRoadmapTopicRequest(BaseModel):
+    roadmap_id: str
+    phase_title: str
+    topic_name: str
     completed: bool
 
 
@@ -65,7 +79,7 @@ def health() -> dict[str, str]:
 
 @api.post("/api/chat", response_model=ChatResponse)
 def chat(request: ChatRequest) -> ChatResponse:
-    """Invoke the LangGraph agent (planner → tools → evaluator)."""
+    """Invoke the LangGraph agent or route to standard conversational LLM based on chatMode."""
     message = request.message.strip()
     if not message:
         raise HTTPException(status_code=400, detail="Message cannot be empty")
@@ -75,9 +89,20 @@ def chat(request: ChatRequest) -> ChatResponse:
     add_message(session_id, "user", message)
 
     try:
-        result: dict[str, Any] = agent_graph.invoke(
-            {"task": message, "iteration": 1},
-        )
+        if request.chatMode == "general_chat":
+            from langchain_groq import ChatGroq
+            import os
+            llm = ChatGroq(
+                model="llama-3.1-8b-instant",
+                api_key=os.getenv("GROQ_API_KEY")
+            )
+            response = llm.invoke(message)
+            response_text = response.content.strip()
+            result = {"result": response_text, "plan": None, "status": "success"}
+        else:
+            result = agent_graph.invoke(
+                {"task": message, "iteration": 1},
+            )
     except Exception as e:
         print(f"CRITICAL BACKEND ERROR: {str(e)}")  # Print the actual error to the terminal
         raise HTTPException(status_code=500, detail=f"Backend Agent Error: {str(e)}")
@@ -129,8 +154,9 @@ def get_tasks() -> TasksResponse:
             save_schedule(sched)
 
     tasks = [TaskItem(task=item["task"], completed=item["completed"]) for item in sched.get("today", [])]
+    tomorrow = [TaskItem(task=item["task"], completed=item["completed"]) for item in sched.get("tomorrow", [])]
     source = "roadmap" if tasks else "fallback"
-    return TasksResponse(tasks=tasks, source=source)
+    return TasksResponse(tasks=tasks, tomorrow=tomorrow, source=source)
 
 
 @api.post("/api/tasks/toggle")
@@ -155,6 +181,53 @@ def toggle_task_endpoint(req: ToggleTaskRequest) -> dict[str, Any]:
         }
     except Exception as exc:
         raise HTTPException(status_code=550, detail=f"Failed to toggle task: {exc}")
+
+
+@api.post("/api/complete-task")
+def complete_task_endpoint(req: CompleteTaskRequest) -> dict[str, Any]:
+    """Complete a task and automatically trigger schedule optimization via Adaptive Planner MCP."""
+    try:
+        from memory.schedule_manager import toggle_task
+        from mcp.progress_mcp import update_progress
+        from mcp.adaptive_planner_mcp import adapt_schedule
+        from memory.progress_manager import calculate_progress
+
+        # a) Update status inside schedule.json and progress.json
+        toggle_task(req.task_name, req.completed)
+        update_progress(req.task_name, req.completed)
+
+        # b) Fire adapt_schedule() to run LLM optimization and c) save to schedule.json
+        new_schedule = adapt_schedule()
+
+        # Recalculate progress metrics
+        progress_data = calculate_progress()
+
+        return {
+            "status": "success",
+            "schedule": new_schedule,
+            "progress": progress_data
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to complete task and adapt schedule: {exc}")
+
+
+@api.post("/api/complete-roadmap-topic")
+def complete_roadmap_topic_endpoint(req: CompleteRoadmapTopicRequest) -> dict[str, Any]:
+    """Toggle completion of a roadmap topic and save it to the structural database."""
+    try:
+        from mcp.roadmap_manager import toggle_roadmap_topic
+        updated_rm = toggle_roadmap_topic(
+            roadmap_id=req.roadmap_id,
+            phase_title=req.phase_title,
+            topic_name=req.topic_name,
+            completed=req.completed
+        )
+        return {
+            "status": "success",
+            "roadmap": updated_rm
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to toggle roadmap topic: {exc}")
 
 
 @api.get("/api/progress")

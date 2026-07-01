@@ -1,6 +1,6 @@
 import { LayoutDashboard, MessageSquare, Map, Zap } from "lucide-react";
 
-export default function Sidebar({ view, setView, views }) {
+export default function Sidebar({ view, setView, views, hasNewRoadmapNotification, setHasNewRoadmapNotification }) {
   return (
     <aside className="w-64 flex-col bg-slate-950/80 border-r border-cyan-500/10 flex h-full justify-between p-4 backdrop-blur-md shrink-0">
       {/* Brand Header */}
@@ -27,7 +27,12 @@ export default function Sidebar({ view, setView, views }) {
               <button
                 key={id}
                 type="button"
-                onClick={() => setView(id)}
+                onClick={() => {
+                  setView(id);
+                  if (id === "roadmaps" && setHasNewRoadmapNotification) {
+                    setHasNewRoadmapNotification(false);
+                  }
+                }}
                 className={`group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition duration-200 border ${isActive
                     ? "border-cyan-neon/35 bg-cyan-neon/10 text-cyan-neon shadow-[0_0_15px_rgba(6,182,212,0.15)]"
                     : "border-transparent text-slate-400 hover:bg-slate-900/60 hover:text-slate-200 hover:border-slate-800/40"
@@ -38,6 +43,12 @@ export default function Sidebar({ view, setView, views }) {
                     }`}
                 />
                 <span>{label}</span>
+                {id === "roadmaps" && hasNewRoadmapNotification && (
+                  <span className="relative flex h-2 w-2 ml-auto">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-neon opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-neon"></span>
+                  </span>
+                )}
               </button>
             );
           })}

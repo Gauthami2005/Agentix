@@ -35,17 +35,34 @@ export function toggleTask(task, completed) {
   });
 }
 
-
-export function sendChat(message, sessionId) {
-  return request("/api/chat", {
+export function completeTask(taskName, completed) {
+  return request("/api/complete-task", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message, session_id: sessionId ?? null }),
+    body: JSON.stringify({ task_name: taskName, completed }),
   });
 }
 
-export async function sendMessageToAgent(text, sessionId) {
-  const data = await sendChat(text.trim(), sessionId);
+
+export function completeRoadmapTopic(roadmapId, phaseTitle, topicName, completed) {
+  return request("/api/complete-roadmap-topic", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ roadmap_id: roadmapId, phase_title: phaseTitle, topic_name: topicName, completed }),
+  });
+}
+
+
+export function sendChat(message, sessionId, chatMode = "general_chat") {
+  return request("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message, session_id: sessionId ?? null, chatMode }),
+  });
+}
+
+export async function sendMessageToAgent(text, sessionId, chatMode) {
+  const data = await sendChat(text.trim(), sessionId, chatMode);
   return { reply: data.response, sessionId: data.session_id };
 }
 

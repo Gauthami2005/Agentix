@@ -1,3 +1,19 @@
 {
-    "roadmaps": []
+    "roadmaps": [
+        {
+            "id": "655c58e5-6dd5-4b84-a6fa-a393d763304d",
+            "title": "Cracking FAANG Technical Interviews in 3 Months",
+            "roadmap": "{\n  \"roadmap_title\": \"Cracking FAANG Technical Interviews in 3 Months\",\n  \"duration\": \"3 Months\",\n  \"phases\": [\n    {\n      \"phase_title\": \"Phase 1: Data Structures and Algorithms Fundamentals\",\n      \"description\": \"Mastering essential data structures and algorithms to crack technical interviews\",\n      \"core_topics\": [\n        \"Arrays and Linked Lists\",\n        \"Stacks and Queues\",\n        \"Trees (BST, AVL, etc.)\",\n        \"Graphs (Basic, DFS, BFS)\",\n        \"Bit Manipulation\",\n        \"Recursion and Backtracking\"\n      ]\n    },\n    {\n      \"phase_title\": \"Phase 2: Coding Challenges and Problem-Solving Strategies\",\n      \"description\": \"Developing strategies to tackle complex coding challenges and practice problem-solving\",\n      \"core_topics\": [\n        \"LeetCode, HackerRank, and other popular platforms\",\n        \"System Design and Scalability\",\n        \"Common Interview Patterns and Tricks\",\n        \"Practice with Mock Interviews and Feedback\",\n        \"Time and Space Complexity Analysis\"\n      ]\n    },\n    {\n      \"phase_title\": \"Phase 3: Advanced Topics and Specialized Skills\",\n      \"description\": \"Mastering advanced topics and specialized skills to become a top candidate\",\n      \"core_topics\": [\n        \"Dynamic Programming (Memoization, Tabulation, etc.)\",\n        \"Greedy Algorithms and Divide and Conquer\",\n        \"Advanced Data Structures (Heaps, Trie, etc.)\",\n        \"Database Systems and SQL\",\n        \"Operating System Fundamentals\"\n      ]\n    },\n    {\n      \"phase_title\": \"Phase 4: Final Preparation and Mock Interviews\",\n      \"description\": \"Final preparation and practice to crack FAANG technical interviews\",\n      \"core_topics\": [\n        \"Review and Practice of All Core Topics\",\n        \"Mock Interviews and Feedback Session\",\n        \"Common Interview Questions and Patterns\",\n        \"Final Preparation and Confidence Building\"\n      ]\n    }\n  ]\n}",
+            "completed_days": [],
+            "completed_topics": [
+                "Common Interview Questions and Patterns",
+                "Mock Interviews and Feedback Session",
+                "Review and Practice of All Core Topics",
+                "Final Preparation and Confidence Building",
+                "Trees (BST, AVL, etc.)",
+                "Stacks and Queues",
+                "Arrays and Linked Lists"
+            ]
+        }
+    ]
 }

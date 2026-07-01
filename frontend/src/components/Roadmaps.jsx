@@ -7,6 +7,19 @@ function cleanTaskKey(text) {
   return text.replace(/^[#\-\*\•\s]+/, "").trim();
 }
 
+function tryParseRoadmap(roadmapStr) {
+  if (!roadmapStr) return null;
+  try {
+    const data = JSON.parse(roadmapStr);
+    if (data && data.roadmap_title && data.phases) {
+      return data;
+    }
+  } catch (e) {
+    // ignore
+  }
+  return null;
+}
+
 export default function Roadmaps() {
   const [roadmaps, setRoadmaps] = useState([]);
   const [selectedRoadmap, setSelectedRoadmap] = useState(null);
@@ -64,6 +77,10 @@ export default function Roadmaps() {
         .map((line) => line.trim())
         .filter((line) => line.length > 0)
     : [];
+
+  const parsedRoadmap = selectedRoadmap
+    ? tryParseRoadmap(selectedRoadmap.roadmap)
+    : null;
 
   return (
     <div className="min-y-screen bg-void text-slate-200 p-6 sm:p-8">
@@ -167,60 +184,119 @@ export default function Roadmaps() {
                     </div>
                   </div>
 
-                  <div className="relative pl-6 space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-cyan-500/10">
-                    {parsedSteps.map((step, idx) => {
-                      const isHeader =
-                        step.toLowerCase().startsWith("week") ||
-                        step.toLowerCase().startsWith("phase") ||
-                        step.startsWith("#");
-
-                      const cleanStep = step.replace(/^[#\-\*\•\s]+/, "");
-                      const checked = !isHeader && !!done[cleanTaskKey(step)];
-
-                      return (
-                        <div key={idx} className="relative group">
-                          {isHeader ? (
-                            <>
+                  {parsedRoadmap ? (
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-4 text-xs font-mono text-cyan-neon">
+                        <span>Duration: {parsedRoadmap.duration}</span>
+                      </div>
+                      <div className="relative pl-6 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-cyan-500/10">
+                        {parsedRoadmap.phases.map((phase, pIdx) => (
+                          <div key={pIdx} className="relative space-y-4">
+                            <div className="relative">
                               <span className="absolute -left-[21px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-emerald-neon bg-void shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
                               <h3 className="text-base font-bold text-emerald-neon pt-0.5 tracking-tight">
-                                {cleanStep}
+                                {phase.phase_title}
                               </h3>
-                            </>
-                          ) : (
-                            <>
-                              <span className={`absolute -left-[18px] top-4 h-2.5 w-2.5 rounded-full border bg-void transition ${
-                                checked 
-                                  ? "border-emerald-neon bg-emerald-neon shadow-[0_0_6px_rgba(16,185,129,0.7)]" 
-                                  : "border-cyan-neon/60 group-hover:bg-cyan-neon group-hover:shadow-[0_0_6px_rgba(6,182,212,0.5)]"
-                              }`} />
-                              <button
-                                type="button"
-                                onClick={() => toggleTask(step)}
-                                className={`w-full text-left rounded-xl border p-3.5 transition duration-200 ${
-                                  checked
-                                    ? "border-emerald-neon/40 bg-emerald-neon/5 shadow-[0_0_12px_rgba(16,185,129,0.12)]"
-                                    : "border-cyan-500/5 bg-void/30 hover:border-cyan-neon/20 hover:bg-void/50"
-                                }`}
-                              >
-                                <div className="flex items-start gap-3">
-                                  {checked ? (
-                                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-neon" />
-                                  ) : (
-                                    <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-500 group-hover:text-cyan-neon" />
-                                  )}
-                                  <span className={`text-sm leading-relaxed ${
-                                    checked ? "text-slate-400 line-through" : "text-slate-200"
-                                  }`}>
-                                    {cleanStep}
-                                  </span>
-                                </div>
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+                              {phase.description && (
+                                <p className="text-xs text-slate-400 mt-1 max-w-xl leading-relaxed">{phase.description}</p>
+                              )}
+                            </div>
+                            <div className="space-y-2.5 pl-1">
+                              {phase.core_topics?.map((topic, tIdx) => {
+                                const checked = !!done[cleanTaskKey(topic)];
+                                return (
+                                  <div key={tIdx} className="relative group">
+                                    <span className={`absolute -left-[18px] top-4 h-2.5 w-2.5 rounded-full border bg-void transition ${
+                                      checked 
+                                        ? "border-emerald-neon bg-emerald-neon shadow-[0_0_6px_rgba(16,185,129,0.7)]" 
+                                        : "border-cyan-neon/60 group-hover:bg-cyan-neon group-hover:shadow-[0_0_6px_rgba(6,182,212,0.5)]"
+                                    }`} />
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleTask(topic)}
+                                      className={`w-full text-left rounded-xl border p-3.5 transition duration-200 ${
+                                        checked
+                                          ? "border-emerald-neon/40 bg-emerald-neon/5 shadow-[0_0_12px_rgba(16,185,129,0.12)]"
+                                          : "border-cyan-500/5 bg-void/30 hover:border-cyan-neon/20 hover:bg-void/50"
+                                      }`}
+                                    >
+                                      <div className="flex items-start gap-3">
+                                        {checked ? (
+                                          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-neon" />
+                                        ) : (
+                                          <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-500 group-hover:text-cyan-neon" />
+                                        )}
+                                        <span className={`text-sm leading-relaxed ${
+                                          checked ? "text-slate-400 line-through" : "text-slate-200"
+                                        }`}>
+                                          {topic}
+                                        </span>
+                                      </div>
+                                    </button>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="relative pl-6 space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-cyan-500/10">
+                      {parsedSteps.map((step, idx) => {
+                        const isHeader =
+                          step.toLowerCase().startsWith("week") ||
+                          step.toLowerCase().startsWith("phase") ||
+                          step.startsWith("#");
+
+                        const cleanStep = step.replace(/^[#\-\*\•\s]+/, "");
+                        const checked = !isHeader && !!done[cleanTaskKey(step)];
+
+                        return (
+                          <div key={idx} className="relative group">
+                            {isHeader ? (
+                              <>
+                                <span className="absolute -left-[21px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-emerald-neon bg-void shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
+                                <h3 className="text-base font-bold text-emerald-neon pt-0.5 tracking-tight">
+                                  {cleanStep}
+                                </h3>
+                              </>
+                            ) : (
+                              <>
+                                <span className={`absolute -left-[18px] top-4 h-2.5 w-2.5 rounded-full border bg-void transition ${
+                                  checked 
+                                    ? "border-emerald-neon bg-emerald-neon shadow-[0_0_6px_rgba(16,185,129,0.7)]" 
+                                    : "border-cyan-neon/60 group-hover:bg-cyan-neon group-hover:shadow-[0_0_6px_rgba(6,182,212,0.5)]"
+                                }`} />
+                                <button
+                                  type="button"
+                                  onClick={() => toggleTask(step)}
+                                  className={`w-full text-left rounded-xl border p-3.5 transition duration-200 ${
+                                    checked
+                                      ? "border-emerald-neon/40 bg-emerald-neon/5 shadow-[0_0_12px_rgba(16,185,129,0.12)]"
+                                      : "border-cyan-500/5 bg-void/30 hover:border-cyan-neon/20 hover:bg-void/50"
+                                  }`}
+                                >
+                                  <div className="flex items-start gap-3">
+                                    {checked ? (
+                                      <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-neon" />
+                                    ) : (
+                                      <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-500 group-hover:text-cyan-neon" />
+                                    )}
+                                    <span className={`text-sm leading-relaxed ${
+                                      checked ? "text-slate-400 line-through" : "text-slate-200"
+                                    }`}>
+                                      {cleanStep}
+                                    </span>
+                                  </div>
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
