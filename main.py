@@ -13,11 +13,15 @@ from memory.schedule_manager import clear_schedule
 
 load_dotenv()
 
+from routes.auth import router as auth_router
+
 api = FastAPI(
     title="Agentix API",
     description="FastAPI backend for the Agentix LangGraph + MCP agent",
     version="1.0.0",
 )
+
+api.include_router(auth_router)
 
 api.add_middleware(
     CORSMiddleware,

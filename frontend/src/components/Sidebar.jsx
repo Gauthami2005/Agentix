@@ -1,6 +1,6 @@
 import { LayoutDashboard, MessageSquare, Map, Zap } from "lucide-react";
 
-export default function Sidebar({ view, setView, views, hasNewRoadmapNotification, setHasNewRoadmapNotification }) {
+export default function Sidebar({ view, setView, views, hasNewRoadmapNotification, setHasNewRoadmapNotification, user }) {
   return (
     <aside className="w-64 flex-col bg-[#121316] border-r border-[#22252a] flex h-full justify-between p-4 shrink-0">
       {/* Brand Header */}
@@ -61,12 +61,12 @@ export default function Sidebar({ view, setView, views, hasNewRoadmapNotificatio
       {/* User Status / Footer */}
       <div className="rounded-xl border border-[#22252a] bg-[#141519] p-4">
         <div className="flex items-center gap-3">
-          <div className="h-2 w-2 rounded-full bg-[#6366f1]" />
+          <div className="h-2 w-2 rounded-full bg-green-500" />
           <span className="font-mono text-[0.65rem] uppercase tracking-wider text-[#9ca3af]">
             Node Online
           </span>
         </div>
-        <p className="mt-1.5 text-xs font-semibold text-[#f3f4f6]">Gauthami</p>
+        <p className="mt-1.5 text-xs font-semibold text-[#f3f4f6]">{user?.displayName || "Gauthami"}</p>
       </div>
     </aside>
   );

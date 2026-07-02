@@ -44,7 +44,7 @@ def execute_tool(task):
                 except Exception:
                     intent_type = "solve_leetcode"
                     problem_name = task
-                return func(intent_type, problem_name)
+                return func(intent_type, problem_name, task)
 
             # LeetCode Search MCP
             elif selected_tool == "leetcode_search":
