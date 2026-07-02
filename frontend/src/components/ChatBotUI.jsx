@@ -49,14 +49,14 @@ function formatTime(date) {
 
 function WelcomeBanner() {
   return (
-    <div className="mx-auto max-w-lg rounded-2xl border border-cyan-neon/20 bg-slate-900/40 px-6 py-8 text-center shadow-[0_0_15px_rgba(6,182,212,0.1)] backdrop-blur-md">
-      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-cyan-neon/30 bg-cyan-neon/10 shadow-[0_0_12px_rgba(6,182,212,0.2)]">
-        <Sparkles className="h-6 w-6 text-cyan-neon" />
+    <div className="mx-auto max-w-lg rounded-2xl border border-[#22252a] bg-[#121316] px-6 py-8 text-center shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-[#22252a] bg-[#1c1d22]">
+        <Sparkles className="h-6 w-6 text-[#6366f1]" />
       </div>
-      <h2 className="bg-gradient-to-r from-cyan-neon to-emerald-neon bg-clip-text text-lg font-semibold text-transparent">
+      <h2 className="text-[#f3f4f6] text-lg font-semibold">
         Agentix AI Chat
       </h2>
-      <p className="mt-2 text-sm leading-relaxed text-slate-400">
+      <p className="mt-2 text-sm leading-relaxed text-[#9ca3af]">
         LangGraph + MCP agent powered by Groq/Llama. Ask for roadmaps, LeetCode
         problems, or today&apos;s study plan.
       </p>
@@ -68,17 +68,17 @@ function UserBubble({ message }) {
   return (
     <div className="flex justify-end gap-3">
       <div className="max-w-[85%] sm:max-w-[75%]">
-        <div className="rounded-2xl rounded-br-md border border-slate-700/60 bg-slate-800/90 px-4 py-3 shadow-lg">
-          <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-100">
+        <div className="rounded-2xl rounded-br-md border border-[#22252a] bg-[#1c1d22] px-4 py-3 shadow-md">
+          <p className="whitespace-pre-wrap text-sm leading-relaxed text-[#f3f4f6]">
             {message.text}
           </p>
         </div>
-        <p className="mt-1.5 text-right font-mono text-[0.65rem] text-slate-500">
+        <p className="mt-1.5 text-right font-mono text-[0.65rem] text-[#9ca3af]">
           {formatTime(message.timestamp)}
         </p>
       </div>
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-600/50 bg-slate-800">
-        <User className="h-4 w-4 text-slate-400" />
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#22252a] bg-[#121316]">
+        <User className="h-4 w-4 text-[#9ca3af]" />
       </div>
     </div>
   );
@@ -89,27 +89,27 @@ function AgentBubble({ message }) {
 
   return (
     <div className="flex gap-3">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-emerald-neon/30 bg-teal-950/80 shadow-[0_0_10px_rgba(16,185,129,0.15)]">
-        <Bot className="h-4 w-4 text-emerald-neon" />
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#22252a] bg-[#121316]">
+        <Bot className="h-4 w-4 text-[#6366f1]" />
       </div>
       <div className="max-w-[85%] sm:max-w-[75%]">
-        <div className="relative overflow-hidden rounded-2xl rounded-bl-md border border-teal-800/40 bg-teal-950/50 pl-4 pr-4 py-3 shadow-[0_0_15px_rgba(6,182,212,0.08)] backdrop-blur-sm">
+        <div className="relative overflow-hidden rounded-2xl rounded-bl-md border border-[#22252a] bg-[#121316] pl-5 pr-4 py-3 shadow-md">
           <div
-            className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-cyan-neon to-emerald-neon shadow-[0_0_8px_rgba(6,182,212,0.6)]"
+            className="absolute inset-y-0 left-0 w-1 bg-[#6366f1]"
             aria-hidden
           />
           {parsedRoadmap ? (
             <div className="space-y-3">
-              <h3 className="text-sm font-bold text-cyan-neon flex items-center gap-1.5">
+              <h3 className="text-sm font-bold text-[#6366f1] flex items-center gap-1.5">
                 🗺️ {parsedRoadmap.roadmap_title} ({parsedRoadmap.duration})
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#9ca3af]">
                 Roadmap created successfully! Head over to the Roadmaps tab to view details and check off topics.
               </p>
-              <div className="space-y-2 border-t border-slate-800 pt-2.5">
+              <div className="space-y-2 border-t border-[#22252a] pt-2.5">
                 {parsedRoadmap.phases.map((phase, idx) => (
                   <div key={idx} className="text-xs space-y-1">
-                    <p className="font-bold text-emerald-neon">{phase.phase_title}</p>
+                    <p className="font-bold text-[#6366f1]">{phase.phase_title}</p>
                     {phase.description && <p className="text-slate-300 ml-2">{phase.description}</p>}
                   </div>
                 ))}
@@ -122,10 +122,10 @@ function AgentBubble({ message }) {
               </p>
               <div className="space-y-4 pt-2">
                 {message.youtubeMetadata.map((video, idx) => (
-                  <div key={idx} className="rounded-2xl border border-slate-800 bg-slate-900/60 p-3.5 shadow-lg space-y-2">
+                  <div key={idx} className="rounded-2xl border border-[#22252a] bg-[#141519] p-3.5 shadow-lg space-y-2">
                     <iframe
                       src={`https://www.youtube.com/embed/${video.video_id}`}
-                      className="w-full aspect-video rounded-xl border border-slate-800 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                      className="w-full aspect-video rounded-xl border border-[#22252a]"
                       allowFullScreen
                       title={video.video_title}
                     />
@@ -133,7 +133,7 @@ function AgentBubble({ message }) {
                       <h4 className="text-xs font-semibold text-slate-200 line-clamp-2 leading-relaxed">
                         {video.video_title}
                       </h4>
-                      <p className="font-mono text-[0.65rem] uppercase tracking-wider text-cyan-neon">
+                      <p className="font-mono text-[0.65rem] uppercase tracking-wider text-[#6366f1]">
                         📺 {video.channel_name}
                       </p>
                     </div>
@@ -147,7 +147,7 @@ function AgentBubble({ message }) {
             </p>
           )}
         </div>
-        <p className="mt-1.5 font-mono text-[0.65rem] text-slate-500">
+        <p className="mt-1.5 font-mono text-[0.65rem] text-[#9ca3af]">
           Agentix · {formatTime(message.timestamp)}
         </p>
       </div>
@@ -158,13 +158,13 @@ function AgentBubble({ message }) {
 function TypingIndicator() {
   return (
     <div className="flex gap-3">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-emerald-neon/30 bg-teal-950/80">
-        <Bot className="h-4 w-4 text-emerald-neon" />
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#22252a] bg-[#121316]">
+        <Bot className="h-4 w-4 text-[#6366f1]" />
       </div>
-      <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-md border border-teal-800/40 bg-teal-950/50 px-4 py-3">
-        <span className="h-2 w-2 animate-bounce rounded-full bg-cyan-neon [animation-delay:0ms]" />
-        <span className="h-2 w-2 animate-bounce rounded-full bg-cyan-neon [animation-delay:150ms]" />
-        <span className="h-2 w-2 animate-bounce rounded-full bg-cyan-neon [animation-delay:300ms]" />
+      <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-md border border-[#22252a] bg-[#121316] px-4 py-3">
+        <span className="h-2 w-2 animate-bounce rounded-full bg-[#6366f1] [animation-delay:0ms]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-[#6366f1] [animation-delay:150ms]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-[#6366f1] [animation-delay:300ms]" />
       </div>
     </div>
   );
@@ -276,19 +276,13 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
 
   return (
     <div className="relative flex h-full min-h-[600px] flex-col bg-void">
-      {/* Ambient glow */}
-      <div
-        className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(6,182,212,0.06),transparent),radial-gradient(ellipse_50%_40%_at_100%_80%,rgba(139,92,246,0.04),transparent)]"
-        aria-hidden
-      />
-
       {browserStatus && (
         <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4 pointer-events-none">
-          <div className="rounded-xl border border-cyan-neon bg-slate-950/95 p-4 text-center shadow-[0_0_30px_rgba(6,182,212,0.5)] backdrop-blur-md animate-pulse">
-            <p className="font-mono text-xs font-bold text-cyan-neon uppercase tracking-widest">
+          <div className="rounded-xl border border-[#6366f1] bg-[#121316] p-4 text-center shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+            <p className="font-mono text-xs font-bold text-[#6366f1] uppercase tracking-widest">
               ⚡ Agentic Browser Hook Triggered
             </p>
-            <p className="mt-1.5 text-sm font-semibold text-slate-100 leading-relaxed">
+            <p className="mt-1.5 text-sm font-semibold text-[#f3f4f6] leading-relaxed">
               Launching Chromium Window for "{browserStatus}"...
             </p>
           </div>
@@ -297,14 +291,14 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
 
       <div className="relative flex min-h-0 flex-1 flex-col">
         {/* Header */}
-        <header className="shrink-0 border-b border-cyan-500/10 bg-slate-900/40 px-4 py-4 backdrop-blur-md sm:px-6">
+        <header className="shrink-0 border-b border-[#22252a] bg-[#121316]/50 px-4 py-4 sm:px-6">
           <div className="mx-auto flex max-w-4xl items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-neon/30 bg-cyan-neon/10 shadow-[0_0_12px_rgba(6,182,212,0.15)]">
-              <Zap className="h-5 w-5 text-cyan-neon" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#22252a] bg-[#1c1d22]">
+              <Zap className="h-5 w-5 text-[#6366f1]" />
             </div>
             <div>
-              <h1 className="text-base font-semibold text-slate-100">Agentix Chat</h1>
-              <p className="font-mono text-[0.65rem] uppercase tracking-wider text-slate-500">
+              <h1 className="text-base font-semibold text-[#f3f4f6]">Agentix Chat</h1>
+              <p className="font-mono text-[0.65rem] uppercase tracking-wider text-[#9ca3af]">
                 POST /api/chat · LangGraph MCP
               </p>
             </div>
@@ -336,7 +330,7 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
         </div>
 
         {/* Input dock */}
-        <footer className="shrink-0 border-t border-cyan-500/10 bg-slate-900/40 px-4 py-4 backdrop-blur-md sm:px-6">
+        <footer className="shrink-0 border-t border-[#22252a] bg-[#121316]/50 px-4 py-4 sm:px-6">
           <form onSubmit={handleSubmit} className="mx-auto max-w-4xl">
             {/* Quick-action chips */}
             <div className="mb-3 flex flex-wrap gap-2">
@@ -346,7 +340,7 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
                   type="button"
                   disabled={isLoading}
                   onClick={() => submitMessage(prompt)}
-                  className="rounded-full border border-cyan-500/20 bg-slate-800/60 px-3.5 py-1.5 text-xs font-medium text-slate-300 shadow-[0_0_15px_rgba(6,182,212,0.1)] transition hover:border-cyan-neon/40 hover:bg-cyan-neon/10 hover:text-cyan-neon hover:shadow-[0_0_18px_rgba(6,182,212,0.2)] disabled:opacity-40"
+                  className="rounded-full border border-[#22252a] bg-[#141519] px-3.5 py-1.5 text-xs font-medium text-[#9ca3af] transition hover:border-[#6366f1]/30 hover:bg-[#1c1e22] hover:text-[#f3f4f6] disabled:opacity-40"
                 >
                   {prompt}
                 </button>
@@ -360,8 +354,8 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
                 onClick={() => setChatMode("general_chat")}
                 className={`rounded-lg border px-4.5 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                   chatMode === "general_chat"
-                    ? "border-cyan-neon/30 bg-slate-900/60 text-cyan-neon shadow-[0_0_15px_rgba(6,182,212,0.2)]"
-                    : "border-slate-800 bg-slate-900/40 text-slate-400 hover:border-slate-700 hover:text-slate-200"
+                    ? "border-[#6366f1]/30 bg-[#6366f1]/5 text-[#f3f4f6]"
+                    : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
                 }`}
               >
                 💬 General Chat
@@ -371,8 +365,8 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
                 onClick={() => setChatMode("generate_roadmap")}
                 className={`rounded-lg border px-4.5 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                   chatMode === "generate_roadmap"
-                    ? "border-cyan-neon/30 bg-slate-900/60 text-cyan-neon shadow-[0_0_15px_rgba(6,182,212,0.2)]"
-                    : "border-slate-800 bg-slate-900/40 text-slate-400 hover:border-slate-700 hover:text-slate-200"
+                    ? "border-[#6366f1]/30 bg-[#6366f1]/5 text-[#f3f4f6]"
+                    : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
                 }`}
               >
                 🗺️ Build Roadmap
@@ -381,12 +375,12 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
 
             {/* Input container with focus glow */}
             <div
-              className={`rounded-2xl border bg-slate-900/50 p-1 transition-all duration-300 backdrop-blur-md ${isFocused
-                ? "border-cyan-neon/50 shadow-[0_0_20px_rgba(6,182,212,0.25),0_0_40px_rgba(139,92,246,0.08)]"
-                : "border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+              className={`rounded-2xl border bg-[#141519]/50 p-1 transition-all duration-300 ${isFocused
+                ? "border-[#6366f1] shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+                : "border-[#22252a] shadow-md"
                 }`}
             >
-              <div className="flex items-end gap-2 rounded-xl bg-void/60 p-2">
+              <div className="flex items-end gap-2 rounded-xl bg-void/40 p-2">
                 <textarea
                   ref={textareaRef}
                   value={input}
@@ -397,14 +391,14 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
                   placeholder="Message Agentix… (Shift+Enter for new line)"
                   rows={1}
                   disabled={isLoading}
-                  className="max-h-36 min-h-[44px] flex-1 resize-none bg-transparent px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none disabled:opacity-50"
+                  className="max-h-36 min-h-[44px] flex-1 resize-none bg-transparent px-3 py-2.5 text-sm text-[#f3f4f6] placeholder:text-slate-500 focus:outline-none disabled:opacity-50"
                   style={{ fieldSizing: "content" }}
                 />
 
                 <button
                   type="submit"
                   disabled={isLoading || !input.trim()}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cyan-neon/40 bg-gradient-to-br from-cyan-neon/20 to-emerald-neon/20 text-cyan-neon shadow-[0_0_15px_rgba(6,182,212,0.2)] transition hover:border-emerald-neon/50 hover:from-cyan-neon/30 hover:to-emerald-neon/30 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#22252a] bg-[#121316] text-[#9ca3af] hover:border-[#6366f1]/50 hover:text-[#f3f4f6] hover:bg-[#1c1e22] disabled:cursor-not-allowed disabled:opacity-40"
                   aria-label="Send message"
                 >
                   {isLoading ? (

@@ -1,11 +1,3 @@
 {
-    "roadmaps": [
-        {
-            "id": "94446999-cf4e-4482-852d-a86f991701ed",
-            "title": "Dynamic Programming Mastery",
-            "roadmap": "{\n  \"roadmap_title\": \"Dynamic Programming Mastery\",\n  \"duration\": \"30 Days\",\n  \"phases\": [\n    {\n      \"phase_title\": \"Phase 1: Fundamentals and Basics\",\n      \"description\": \"Understand the basics of dynamic programming, memoization, and tabulation.\",\n      \"core_topics\": [\n        \"Introduction to Dynamic Programming\",\n        \"Memoization vs Tabulation\",\n        \"1D DP Basics: Fibonacci Series, Longest Common Subsequence\"\n      ]\n    },\n    {\n      \"phase_title\": \"Phase 2: 2D DP and Advanced Topics\",\n      \"description\": \"Master 2D dynamic programming, and understand advanced topics like knapsack, matrix chain multiplication, and longest common subsequence.\",\n      \"core_topics\": [\n        \"2D DP Basics: Matrix Chain Multiplication\",\n        \"Knapsack Problem: 0/1 Knapsack, Unbounded Knapsack\",\n        \"Longest Common Subsequence: 1D, 2D, and Optimized Solutions\"\n      ]\n    },\n    {\n      \"phase_title\": \"Phase 3: Practice and Real-World Applications\",\n      \"description\": \"Apply dynamic programming to solve real-world problems, and practice solving problems on platforms like LeetCode, HackerRank.\",\n      \"core_topics\": [\n        \"Dynamic Programming in Real-World Applications\",\n        \"Practice Problems: LeetCode, HackerRank, and others\",\n        \"Common Mistakes and Best Practices\"\n      ]\n    }\n  ]\n}",
-            "completed_days": [],
-            "completed_topics": []
-        }
-    ]
+    "roadmaps": []
 }

@@ -14,21 +14,14 @@ export function ProgressRing({
       width={size}
       height={size}
       viewBox={`0 0 ${size} ${size}`}
-      className="drop-shadow-[0_0_8px_rgba(6,182,212,0.45)]"
       aria-label={`Progress ${pct}%`}
     >
-      <defs>
-        <linearGradient id="agentix-ring" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#06B6D4" />
-          <stop offset="100%" stopColor="#10B981" />
-        </linearGradient>
-      </defs>
       <circle
         cx={center}
         cy={center}
         r={radius}
         fill="none"
-        stroke="rgba(6,182,212,0.12)"
+        stroke="#22252a"
         strokeWidth={strokeWidth}
       />
       <circle
@@ -36,7 +29,7 @@ export function ProgressRing({
         cy={center}
         r={radius}
         fill="none"
-        stroke="url(#agentix-ring)"
+        stroke="#6366f1"
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeDasharray={circumference}
@@ -48,7 +41,7 @@ export function ProgressRing({
         x={center}
         y={center - 4}
         textAnchor="middle"
-        fill="#E2E8F0"
+        fill="#f3f4f6"
         fontSize={size * 0.16}
         fontWeight={700}
         fontFamily="Inter, sans-serif"
@@ -59,7 +52,7 @@ export function ProgressRing({
         x={center}
         y={center + 14}
         textAnchor="middle"
-        fill="#94A3B8"
+        fill="#9ca3af"
         fontSize={size * 0.07}
         fontFamily="'JetBrains Mono', monospace"
         letterSpacing="0.12em"

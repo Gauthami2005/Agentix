@@ -2,18 +2,18 @@ import { LayoutDashboard, MessageSquare, Map, Zap } from "lucide-react";
 
 export default function Sidebar({ view, setView, views, hasNewRoadmapNotification, setHasNewRoadmapNotification }) {
   return (
-    <aside className="w-64 flex-col bg-slate-950/80 border-r border-cyan-500/10 flex h-full justify-between p-4 backdrop-blur-md shrink-0">
+    <aside className="w-64 flex-col bg-[#121316] border-r border-[#22252a] flex h-full justify-between p-4 shrink-0">
       {/* Brand Header */}
       <div>
         <div className="flex items-center gap-3 px-2 py-4 mb-8">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-neon/40 bg-cyan-neon/10 shadow-[0_0_12px_rgba(6,182,212,0.25)]">
-            <Zap className="h-5 w-5 text-cyan-neon animate-pulse" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#22252a] bg-[#1c1d22]">
+            <Zap className="h-5 w-5 text-[#6366f1]" />
           </div>
           <div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-neon to-emerald-neon bg-clip-text text-transparent tracking-wider">
+            <h1 className="text-xl font-bold text-[#f3f4f6] tracking-wider">
               Agentix
             </h1>
-            <p className="font-mono text-[0.6rem] uppercase tracking-wider text-slate-500">
+            <p className="font-mono text-[0.6rem] uppercase tracking-wider text-[#9ca3af]">
               v1.0.0 · Core OS
             </p>
           </div>
@@ -33,20 +33,23 @@ export default function Sidebar({ view, setView, views, hasNewRoadmapNotificatio
                     setHasNewRoadmapNotification(false);
                   }
                 }}
-                className={`group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition duration-200 border ${isActive
-                    ? "border-cyan-neon/35 bg-cyan-neon/10 text-cyan-neon shadow-[0_0_15px_rgba(6,182,212,0.15)]"
-                    : "border-transparent text-slate-400 hover:bg-slate-900/60 hover:text-slate-200 hover:border-slate-800/40"
+                className={`group relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition duration-200 border ${isActive
+                    ? "border-[#22252a] bg-[#1c1d22] text-[#f3f4f6]"
+                    : "border-transparent text-[#9ca3af] hover:bg-[#1c1e22] hover:text-[#f3f4f6]"
                   }`}
               >
+                {isActive && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r bg-[#6366f1]" />
+                )}
                 <Icon
-                  className={`h-4.5 w-4.5 transition duration-200 ${isActive ? "text-cyan-neon scale-110" : "text-slate-400 group-hover:text-slate-200"
+                  className={`h-4.5 w-4.5 transition duration-200 ${isActive ? "text-[#6366f1] scale-110" : "text-[#9ca3af] group-hover:text-[#f3f4f6]"
                     }`}
                 />
                 <span>{label}</span>
                 {id === "roadmaps" && hasNewRoadmapNotification && (
                   <span className="relative flex h-2 w-2 ml-auto">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-neon opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-neon"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#6366f1] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#6366f1]"></span>
                   </span>
                 )}
               </button>
@@ -56,14 +59,14 @@ export default function Sidebar({ view, setView, views, hasNewRoadmapNotificatio
       </div>
 
       {/* User Status / Footer */}
-      <div className="rounded-xl border border-cyan-500/10 bg-slate-900/40 p-4">
+      <div className="rounded-xl border border-[#22252a] bg-[#141519] p-4">
         <div className="flex items-center gap-3">
-          <div className="h-2 w-2 rounded-full bg-emerald-neon animate-ping" />
-          <span className="font-mono text-[0.65rem] uppercase tracking-wider text-slate-400">
+          <div className="h-2 w-2 rounded-full bg-[#6366f1]" />
+          <span className="font-mono text-[0.65rem] uppercase tracking-wider text-[#9ca3af]">
             Node Online
           </span>
         </div>
-        <p className="mt-1.5 text-xs font-semibold text-slate-200">Gauthami</p>
+        <p className="mt-1.5 text-xs font-semibold text-[#f3f4f6]">Gauthami</p>
       </div>
     </aside>
   );

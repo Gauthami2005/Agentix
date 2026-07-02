@@ -84,23 +84,17 @@ export default function Roadmaps() {
 
   return (
     <div className="min-y-screen bg-void text-slate-200 p-6 sm:p-8">
-      {/* Ambient background glow */}
-      <div
-        className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_-10%,rgba(16,185,129,0.06),transparent),radial-gradient(ellipse_50%_40%_at_0%_100%,rgba(6,182,212,0.04),transparent)]"
-        aria-hidden
-      />
-
       <div className="relative mx-auto max-w-6xl">
         <header className="mb-8 flex items-center justify-between">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-neon/40 bg-emerald-neon/10 px-3 py-1 font-mono text-[0.65rem] uppercase tracking-wider text-emerald-neon">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#22252a] bg-[#121316] px-3 py-1 font-mono text-[0.65rem] uppercase tracking-wider text-[#9ca3af]">
               <Compass className="h-3 w-3" />
               Syllabus & Milestones
             </span>
-            <h1 className="mt-2 bg-gradient-to-r from-cyan-neon to-emerald-neon bg-clip-text text-3xl font-bold tracking-tight text-transparent">
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-[#f3f4f6]">
               Study Roadmaps
             </h1>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-[#9ca3af]">
               Interactive structural timelines compiled by your AI agent
             </p>
           </div>
@@ -109,7 +103,7 @@ export default function Roadmaps() {
             type="button"
             onClick={loadRoadmaps}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-neon/40 bg-cyan-neon/10 px-3.5 py-2 text-xs font-medium text-cyan-neon transition hover:border-emerald-neon/50 hover:bg-cyan-neon/20 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[#22252a] bg-[#121316] px-3.5 py-2 text-xs font-medium text-[#f3f4f6] transition hover:border-[#6366f1]/50 hover:bg-[#1c1e22] disabled:opacity-50"
           >
             {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
             Refresh
@@ -117,20 +111,20 @@ export default function Roadmaps() {
         </header>
 
         {loading && roadmaps.length === 0 ? (
-          <div className="flex h-64 items-center justify-center rounded-2xl border border-cyan-neon/10 bg-slate-900/20 backdrop-blur-md">
-            <Loader2 className="h-8 w-8 animate-spin text-cyan-neon" />
+          <div className="flex h-64 items-center justify-center rounded-2xl border border-[#22252a] bg-[#121316]">
+            <Loader2 className="h-8 w-8 animate-spin text-[#6366f1]" />
           </div>
         ) : error ? (
           <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 px-5 py-4 text-sm text-amber-200">
             Error loading roadmaps: {error}
           </div>
         ) : roadmaps.length === 0 ? (
-          <div className="mx-auto max-w-lg rounded-2xl border border-cyan-neon/20 bg-slate-900/40 px-6 py-8 text-center shadow-[0_0_15px_rgba(6,182,212,0.1)] backdrop-blur-md">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-cyan-neon/30 bg-cyan-neon/10 shadow-[0_0_12px_rgba(6,182,212,0.2)]">
-              <Sparkles className="h-6 w-6 text-cyan-neon" />
+          <div className="mx-auto max-w-lg rounded-2xl border border-[#22252a] bg-[#121316] px-6 py-8 text-center shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-[#22252a] bg-[#1c1d22]">
+              <Sparkles className="h-6 w-6 text-[#6366f1]" />
             </div>
-            <h2 className="text-lg font-semibold text-slate-100">No Roadmaps Found</h2>
-            <p className="mt-2 text-sm leading-relaxed text-slate-400">
+            <h2 className="text-lg font-semibold text-[#f3f4f6]">No Roadmaps Found</h2>
+            <p className="mt-2 text-sm leading-relaxed text-[#9ca3af]">
               You haven't generated any study roadmaps yet. Ask the AI Chat agent to create a customized study path for you.
             </p>
           </div>
@@ -138,7 +132,7 @@ export default function Roadmaps() {
           <div className="grid gap-8 md:grid-cols-[250px_1fr]">
             {/* Sidebar list of roadmaps */}
             <div className="space-y-3">
-              <p className="font-mono text-[0.65rem] uppercase tracking-wider text-slate-500 px-1">
+              <p className="font-mono text-[0.65rem] uppercase tracking-wider text-[#9ca3af] px-1">
                 Saved Sprints
               </p>
               <div className="flex flex-col gap-2 max-h-[500px] overflow-y-auto pr-1">
@@ -151,11 +145,11 @@ export default function Roadmaps() {
                       onClick={() => setSelectedRoadmap(rm)}
                       className={`text-left w-full rounded-xl border p-3.5 transition duration-200 ${
                         isSelected
-                          ? "border-emerald-neon/40 bg-emerald-neon/10 text-emerald-neon shadow-[0_0_12px_rgba(16,185,129,0.12)]"
-                          : "border-cyan-neon/10 bg-surface/50 text-slate-400 hover:border-cyan-neon/30 hover:text-slate-200"
+                          ? "border-[#6366f1]/30 bg-[#6366f1]/5 text-[#f3f4f6]"
+                          : "border-[#22252a] bg-[#121316]/50 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6] hover:bg-[#1c1e22]"
                       }`}
                     >
-                      <p className="text-xs font-mono text-slate-500 mb-1 flex items-center gap-1.5">
+                      <p className="text-xs font-mono text-[#9ca3af] mb-1 flex items-center gap-1.5">
                         <Calendar className="h-3 w-3" />
                         ID: {rm.id.slice(0, 8)}
                       </p>
@@ -169,16 +163,16 @@ export default function Roadmaps() {
             </div>
 
             {/* Detailed Roadmap content */}
-            <div className="rounded-2xl border border-cyan-neon/20 bg-gradient-to-br from-surface to-surface-2 p-6 shadow-[0_0_20px_rgba(6,182,212,0.08)]">
+            <div className="rounded-2xl border border-[#22252a] bg-[#121316] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
               {selectedRoadmap && (
                 <div>
-                  <div className="border-b border-cyan-500/10 pb-5 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="border-b border-[#22252a] pb-5 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="space-y-1">
-                      <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
-                        <Target className="h-5 w-5 text-emerald-neon" />
+                      <h2 className="text-xl font-bold text-[#f3f4f6] flex items-center gap-2">
+                        <Target className="h-5 w-5 text-[#6366f1]" />
                         {selectedRoadmap.title || "Study Roadmap"}
                       </h2>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-[#9ca3af]">
                         Detailed layout of all targets, chapters, and tasks.
                       </p>
                     </div>
@@ -186,15 +180,15 @@ export default function Roadmaps() {
 
                   {parsedRoadmap ? (
                     <div className="space-y-6">
-                      <div className="flex items-center gap-4 text-xs font-mono text-cyan-neon">
+                      <div className="flex items-center gap-4 text-xs font-mono text-[#6366f1]">
                         <span>Duration: {parsedRoadmap.duration}</span>
                       </div>
-                      <div className="relative pl-6 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-cyan-500/10">
+                      <div className="relative pl-6 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-[#22252a]">
                         {parsedRoadmap.phases.map((phase, pIdx) => (
                           <div key={pIdx} className="relative space-y-4">
                             <div className="relative">
-                              <span className="absolute -left-[21px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-emerald-neon bg-void shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
-                              <h3 className="text-base font-bold text-emerald-neon pt-0.5 tracking-tight">
+                              <span className="absolute -left-[21px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-[#6366f1] bg-[#0b0c0e]" />
+                              <h3 className="text-base font-bold text-[#f3f4f6] pt-0.5 tracking-tight">
                                 {phase.phase_title}
                               </h3>
                               {phase.description && (
@@ -206,28 +200,28 @@ export default function Roadmaps() {
                                 const checked = !!done[cleanTaskKey(topic)];
                                 return (
                                   <div key={tIdx} className="relative group">
-                                    <span className={`absolute -left-[18px] top-4 h-2.5 w-2.5 rounded-full border bg-void transition ${
+                                    <span className={`absolute -left-[18px] top-4 h-2.5 w-2.5 rounded-full border bg-[#0b0c0e] transition ${
                                       checked 
-                                        ? "border-emerald-neon bg-emerald-neon shadow-[0_0_6px_rgba(16,185,129,0.7)]" 
-                                        : "border-cyan-neon/60 group-hover:bg-cyan-neon group-hover:shadow-[0_0_6px_rgba(6,182,212,0.5)]"
+                                        ? "border-[#6366f1] bg-[#6366f1]" 
+                                        : "border-slate-700 group-hover:border-[#6366f1]"
                                     }`} />
                                     <button
                                       type="button"
                                       onClick={() => toggleTask(topic)}
                                       className={`w-full text-left rounded-xl border p-3.5 transition duration-200 ${
                                         checked
-                                          ? "border-emerald-neon/40 bg-emerald-neon/5 shadow-[0_0_12px_rgba(16,185,129,0.12)]"
-                                          : "border-cyan-500/5 bg-void/30 hover:border-cyan-neon/20 hover:bg-void/50"
+                                          ? "border-[#6366f1]/20 bg-[#6366f1]/5 text-[#f3f4f6]"
+                                          : "border-[#22252a] bg-[#121316]/50 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6] hover:bg-[#1c1e22]"
                                       }`}
                                     >
                                       <div className="flex items-start gap-3">
                                         {checked ? (
-                                          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-neon" />
+                                          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#6366f1]" />
                                         ) : (
-                                          <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-500 group-hover:text-cyan-neon" />
+                                          <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-600 group-hover:text-[#6366f1]" />
                                         )}
                                         <span className={`text-sm leading-relaxed ${
-                                          checked ? "text-slate-400 line-through" : "text-slate-200"
+                                          checked ? "text-[#9ca3af] line-through" : "text-[#f3f4f6]"
                                         }`}>
                                           {topic}
                                         </span>
@@ -242,7 +236,7 @@ export default function Roadmaps() {
                       </div>
                     </div>
                   ) : (
-                    <div className="relative pl-6 space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-cyan-500/10">
+                    <div className="relative pl-6 space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-[#22252a]">
                       {parsedSteps.map((step, idx) => {
                         const isHeader =
                           step.toLowerCase().startsWith("week") ||
@@ -256,35 +250,35 @@ export default function Roadmaps() {
                           <div key={idx} className="relative group">
                             {isHeader ? (
                               <>
-                                <span className="absolute -left-[21px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-emerald-neon bg-void shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
-                                <h3 className="text-base font-bold text-emerald-neon pt-0.5 tracking-tight">
+                                <span className="absolute -left-[21px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-[#6366f1] bg-[#0b0c0e]" />
+                                <h3 className="text-base font-bold text-[#f3f4f6] pt-0.5 tracking-tight">
                                   {cleanStep}
                                 </h3>
                               </>
                             ) : (
                               <>
-                                <span className={`absolute -left-[18px] top-4 h-2.5 w-2.5 rounded-full border bg-void transition ${
+                                <span className={`absolute -left-[18px] top-4 h-2.5 w-2.5 rounded-full border bg-[#0b0c0e] transition ${
                                   checked 
-                                    ? "border-emerald-neon bg-emerald-neon shadow-[0_0_6px_rgba(16,185,129,0.7)]" 
-                                    : "border-cyan-neon/60 group-hover:bg-cyan-neon group-hover:shadow-[0_0_6px_rgba(6,182,212,0.5)]"
+                                    ? "border-[#6366f1] bg-[#6366f1]" 
+                                    : "border-slate-700 group-hover:border-[#6366f1]"
                                 }`} />
                                 <button
                                   type="button"
                                   onClick={() => toggleTask(step)}
                                   className={`w-full text-left rounded-xl border p-3.5 transition duration-200 ${
                                     checked
-                                      ? "border-emerald-neon/40 bg-emerald-neon/5 shadow-[0_0_12px_rgba(16,185,129,0.12)]"
-                                      : "border-cyan-500/5 bg-void/30 hover:border-cyan-neon/20 hover:bg-void/50"
+                                      ? "border-[#6366f1]/20 bg-[#6366f1]/5 text-[#f3f4f6]"
+                                      : "border-[#22252a] bg-[#121316]/50 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6] hover:bg-[#1c1e22]"
                                   }`}
                                 >
                                   <div className="flex items-start gap-3">
                                     {checked ? (
-                                      <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-neon" />
+                                      <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#6366f1]" />
                                     ) : (
-                                      <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-500 group-hover:text-cyan-neon" />
+                                      <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-600 group-hover:text-[#6366f1]" />
                                     )}
                                     <span className={`text-sm leading-relaxed ${
-                                      checked ? "text-slate-400 line-through" : "text-slate-200"
+                                      checked ? "text-[#9ca3af] line-through" : "text-[#f3f4f6]"
                                     }`}>
                                       {cleanStep}
                                     </span>

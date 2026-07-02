@@ -31,16 +31,10 @@ function formatDate() {
 function Card({
   children,
   className = "",
-  glow = "cyan",
 }) {
-  const border =
-    glow === "emerald"
-      ? "border-emerald-neon/35 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
-      : "border-cyan-neon/35 shadow-[0_0_15px_rgba(6,182,212,0.15)]";
-
   return (
     <div
-      className={`rounded-2xl border bg-gradient-to-br from-surface to-surface-2 p-5 ${border} ${className}`}
+      className={`rounded-2xl border border-[#22252a] bg-[#121316] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.4)] ${className}`}
     >
       {children}
     </div>
@@ -49,7 +43,7 @@ function Card({
 
 function SectionLabel({ icon: Icon, label }) {
   return (
-    <div className="mb-4 flex items-center gap-2 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-cyan-neon">
+    <div className="mb-4 flex items-center gap-2 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-[#6366f1]">
       <Icon className="h-3.5 w-3.5" strokeWidth={2} />
       {label}
     </div>
@@ -402,10 +396,10 @@ export default function Dashboard({ setView }) {
                   Clear Roadmap
                 </button>
               </div>
-              <h1 className="bg-gradient-to-r from-cyan-neon to-emerald-neon bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl">
+              <h1 className="text-3xl font-bold tracking-tight text-[#f3f4f6] sm:text-4xl">
                 {greeting()} Gauthami
               </h1>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-[#9ca3af]">
                 LangGraph + MCP agent ready · {formatDate()}
               </p>
               {roadmaps.length > 0 && (
@@ -413,15 +407,15 @@ export default function Dashboard({ setView }) {
                   <select
                     value={activeRoadmapId}
                     onChange={(e) => setActiveRoadmapId(e.target.value)}
-                    className="w-full appearance-none rounded-xl border border-cyan-neon/30 bg-slate-900/80 px-4 py-2 pr-10 text-xs font-semibold text-slate-200 shadow-[0_0_15px_rgba(6,182,212,0.05)] transition-all hover:border-cyan-neon/60 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] focus:border-cyan-neon focus:outline-none focus:shadow-[0_0_15px_rgba(6,182,212,0.2)] cursor-pointer"
+                    className="w-full appearance-none rounded-xl border border-[#22252a] bg-[#141519] px-4 py-2 pr-10 text-xs font-semibold text-[#f3f4f6] shadow-md transition hover:border-[#6366f1]/50 focus:border-[#6366f1] focus:outline-none cursor-pointer"
                   >
                     {roadmaps.map((r) => (
-                      <option key={r.id} value={r.id} className="bg-slate-950 text-slate-200">
+                      <option key={r.id} value={r.id} className="bg-[#121316] text-[#f3f4f6]">
                         {r.title}
                       </option>
                     ))}
                   </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-cyan-neon">
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#9ca3af]">
                     <ChevronDown className="h-4 w-4" />
                   </div>
                 </div>
@@ -432,21 +426,21 @@ export default function Dashboard({ setView }) {
               <ProgressRing percent={progressPct} />
 
               <div className="flex flex-col gap-3">
-                <div className="rounded-xl border border-emerald-neon/35 bg-surface/80 px-5 py-3 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
-                  <p className="font-mono text-[0.6rem] uppercase tracking-widest text-slate-400">
+                <div className="rounded-xl border border-[#22252a] bg-[#141519] px-5 py-3 shadow-md">
+                  <p className="font-mono text-[0.6rem] uppercase tracking-widest text-[#9ca3af]">
                     Study Streak
                   </p>
-                  <p className="mt-1 flex items-center gap-2 text-2xl font-bold text-emerald-neon">
-                    <Flame className="h-6 w-6 text-orange-400" />
+                  <p className="mt-1 flex items-center gap-2 text-2xl font-bold text-[#f3f4f6]">
+                    <Flame className="h-6 w-6 text-orange-500" />
                     7 days
                   </p>
                 </div>
-                <div className="rounded-xl border border-cyan-neon/35 bg-surface/80 px-5 py-3 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
-                  <p className="font-mono text-[0.6rem] uppercase tracking-widest text-slate-400">
+                <div className="rounded-xl border border-[#22252a] bg-[#141519] px-5 py-3 shadow-md">
+                  <p className="font-mono text-[0.6rem] uppercase tracking-widest text-[#9ca3af]">
                     Target Goal
                   </p>
-                  <p className="mt-1 flex items-start gap-2 text-sm font-medium leading-snug text-slate-200">
-                    <Target className="mt-0.5 h-4 w-4 shrink-0 text-cyan-neon" />
+                  <p className="mt-1 flex items-start gap-2 text-sm font-medium leading-snug text-[#f3f4f6]">
+                    <Target className="mt-0.5 h-4 w-4 shrink-0 text-[#6366f1]" />
                     <span className="line-clamp-2">{targetGoal}</span>
                   </p>
                 </div>
@@ -466,7 +460,7 @@ export default function Dashboard({ setView }) {
             <SectionLabel icon={Sparkles} label="Today's Tasks" />
             <Card>
               <div className="mb-4 flex items-center justify-between">
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-[#9ca3af]">
                   {completedCount}/{tasks.length} completed
                   {taskSource === "roadmap" ? " · synced from roadmap" : " · default queue"}
                 </p>
@@ -474,7 +468,7 @@ export default function Dashboard({ setView }) {
                   type="button"
                   onClick={loadData}
                   disabled={loading}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-neon/40 bg-cyan-neon/10 px-3 py-1.5 text-xs font-medium text-cyan-neon transition hover:border-emerald-neon/50 hover:bg-cyan-neon/20 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-[#22252a] bg-[#121316] px-3 py-1.5 text-xs font-medium text-[#f3f4f6] transition hover:border-[#6366f1]/50 hover:bg-[#1c1e22] disabled:opacity-50"
                 >
                   {loading ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -495,8 +489,8 @@ export default function Dashboard({ setView }) {
                         <div
                           onClick={() => toggleTask(taskText)}
                           className={`group flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left transition cursor-pointer ${checked
-                            ? "border-emerald-neon/40 bg-emerald-neon/5 shadow-[0_0_12px_rgba(16,185,129,0.12)]"
-                            : "border-cyan-neon/20 bg-void/40 hover:border-cyan-neon/40 hover:shadow-[0_0_12px_rgba(6,182,212,0.1)]"
+                            ? "border-[#6366f1]/20 bg-[#6366f1]/5"
+                            : "border-[#22252a] bg-[#141519]/50 hover:border-[#6366f1]/30 hover:bg-[#1c1e22]"
                             }`}
                         >
                           <button
@@ -506,18 +500,18 @@ export default function Dashboard({ setView }) {
                               toggleTask(taskText);
                             }}
                             className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border bg-transparent transition-all duration-350 cursor-pointer ${checked
-                                ? "border-emerald-neon/40 text-emerald-neon"
-                                : "border-slate-500 text-slate-500 group-hover:border-cyan-neon"
+                                ? "border-[#6366f1]/40 text-[#6366f1]"
+                                : "border-slate-600 text-slate-500 group-hover:border-[#6366f1]"
                               }`}
                           >
                             {checked ? (
-                              <CheckCircle2 className="h-4 w-4 text-emerald-neon" />
+                              <CheckCircle2 className="h-4 w-4 text-[#6366f1]" />
                             ) : (
-                              <Circle className="h-4 w-4 text-slate-500 group-hover:text-cyan-neon" />
+                              <Circle className="h-4 w-4 text-slate-600 group-hover:text-[#6366f1]" />
                             )}
                           </button>
                           <span
-                            className={`text-sm leading-relaxed ${checked ? "text-slate-400 line-through" : "text-slate-200"
+                            className={`text-sm leading-relaxed ${checked ? "text-[#9ca3af] line-through" : "text-slate-200"
                               }`}
                           >
                             {taskText}
@@ -531,7 +525,7 @@ export default function Dashboard({ setView }) {
                 <button
                   type="button"
                   onClick={() => setView("chat")}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/40 px-6 py-8 text-center text-sm font-semibold text-white shadow-[0_0_15px_rgba(6,182,212,0.05)] hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all duration-300 hover:border-cyan-neon/40 cursor-pointer"
+                  className="w-full rounded-xl border border-dashed border-[#22252a] bg-[#121316]/50 px-6 py-8 text-center text-sm font-semibold text-[#9ca3af] transition hover:border-[#6366f1]/50 hover:bg-[#1c1e22] hover:text-[#f3f4f6] cursor-pointer"
                 >
                   ➕ Create a Roadmap
                 </button>
@@ -545,14 +539,14 @@ export default function Dashboard({ setView }) {
               {parsedData && parsedData.phases ? (
                 <ol className="space-y-5">
                   {parsedData.phases.map((phase, i) => (
-                    <li key={phase.phase_title} className="relative border-l-2 border-cyan-neon/30 pl-4 pb-2">
+                    <li key={phase.phase_title} className="relative border-l-2 border-[#22252a] pl-4 pb-2">
                       <span
-                        className={`absolute -left-[5px] top-1.5 h-2 w-2 rounded-full ${i === 0 ? "bg-emerald-neon shadow-[0_0_8px_rgba(16,185,129,0.7)]" : "bg-cyan-neon/60"
+                        className={`absolute -left-[5px] top-1.5 h-2 w-2 rounded-full ${i === 0 ? "bg-[#6366f1]" : "bg-[#22252a]"
                           }`}
                       />
-                      <h4 className="text-sm font-bold text-slate-200 leading-snug">{phase.phase_title}</h4>
+                      <h4 className="text-sm font-bold text-[#f3f4f6] leading-snug">{phase.phase_title}</h4>
                       {phase.description && (
-                        <p className="mt-1 text-xs text-slate-400 leading-relaxed">{phase.description}</p>
+                        <p className="mt-1 text-xs text-[#9ca3af] leading-relaxed">{phase.description}</p>
                       )}
                       {phase.core_topics && phase.core_topics.length > 0 && (
                         <div className="mt-3.5 space-y-2">
@@ -567,25 +561,25 @@ export default function Dashboard({ setView }) {
                                 }}
                                 className={`flex items-center gap-2.5 rounded-lg border px-3 py-1.5 text-left transition cursor-pointer text-xs ${
                                   isTopicCompleted
-                                    ? "border-emerald-neon/40 bg-emerald-neon/5 text-emerald-neon shadow-[0_0_8px_rgba(16,185,129,0.06)]"
-                                    : "border-slate-800/80 bg-slate-900/30 text-slate-300 hover:border-cyan-neon/30 hover:bg-slate-900/60"
+                                    ? "border-[#6366f1]/20 bg-[#6366f1]/5 text-[#f3f4f6]"
+                                    : "border-[#22252a] bg-[#141519]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:bg-[#1c1e22]"
                                 }`}
                               >
                                 <button
                                   type="button"
                                   className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border bg-transparent transition-all duration-300 cursor-pointer ${
                                     isTopicCompleted
-                                      ? "border-emerald-neon/50 text-emerald-neon"
-                                      : "border-slate-600 text-slate-500 hover:border-cyan-neon"
+                                      ? "border-[#6366f1]/40 text-[#6366f1]"
+                                      : "border-slate-600 text-slate-500 hover:border-[#6366f1]"
                                   }`}
                                 >
                                   {isTopicCompleted ? (
-                                    <CheckCircle2 className="h-3 w-3 text-emerald-neon" />
+                                    <CheckCircle2 className="h-3 w-3 text-[#6366f1]" />
                                   ) : (
-                                    <Circle className="h-3 w-3 text-slate-500 hover:text-cyan-neon" />
+                                    <Circle className="h-3 w-3 text-slate-600 hover:text-[#6366f1]" />
                                   )}
                                 </button>
-                                <span className={isTopicCompleted ? "line-through text-slate-400" : ""}>
+                                <span className={isTopicCompleted ? "line-through text-[#9ca3af]" : ""}>
                                   {topic}
                                 </span>
                               </div>
@@ -599,31 +593,31 @@ export default function Dashboard({ setView }) {
               ) : tomorrowTasks.length > 0 ? (
                 <ol className="space-y-4">
                   {tomorrowTasks.map((t, i) => (
-                    <li key={t.task || t} className="relative border-l-2 border-cyan-neon/30 pl-4">
+                    <li key={t.task || t} className="relative border-l-2 border-[#22252a] pl-4">
                       <span
-                        className={`absolute -left-[5px] top-1.5 h-2 w-2 rounded-full ${i === 0 ? "bg-emerald-neon shadow-[0_0_8px_rgba(16,185,129,0.7)]" : "bg-cyan-neon/60"
+                        className={`absolute -left-[5px] top-1.5 h-2 w-2 rounded-full ${i === 0 ? "bg-[#6366f1]" : "bg-[#22252a]"
                           }`}
                       />
-                      <p className="text-sm leading-relaxed text-slate-300">{t.task || t}</p>
+                      <p className="text-sm leading-relaxed text-[#f3f4f6]">{t.task || t}</p>
                     </li>
                   ))}
                 </ol>
               ) : timelineLines.length > 0 ? (
                 <ol className="space-y-4">
                   {timelineLines.map((line, i) => (
-                    <li key={line} className="relative border-l-2 border-cyan-neon/30 pl-4">
+                    <li key={line} className="relative border-l-2 border-[#22252a] pl-4">
                       <span
-                        className={`absolute -left-[5px] top-1.5 h-2 w-2 rounded-full ${i === 0 ? "bg-emerald-neon shadow-[0_0_8px_rgba(16,185,129,0.7)]" : "bg-cyan-neon/60"
+                        className={`absolute -left-[5px] top-1.5 h-2 w-2 rounded-full ${i === 0 ? "bg-[#6366f1]" : "bg-[#22252a]"
                           }`}
                       />
-                      <p className="text-sm leading-relaxed text-slate-300">{line}</p>
+                      <p className="text-sm leading-relaxed text-[#f3f4f6]">{line}</p>
                     </li>
                   ))}
                 </ol>
               ) : (
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-[#9ca3af]">
                   No roadmap saved yet. Ask the AI agent to generate one via{" "}
-                  <code className="rounded bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-cyan-neon">
+                  <code className="rounded bg-[#141519] px-1.5 py-0.5 font-mono text-xs text-[#6366f1]">
                     POST /api/chat
                   </code>
                   .
@@ -631,11 +625,11 @@ export default function Dashboard({ setView }) {
               )}
             </Card>
 
-            <div className="rounded-2xl border border-emerald-neon/40 bg-emerald-neon/5 p-5 shadow-[0_0_15px_rgba(16,185,129,0.18)]">
-              <p className="font-mono text-[0.65rem] uppercase tracking-[0.12em] text-emerald-neon">
+            <div className="rounded-2xl border border-[#22252a] bg-[#121316] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+              <p className="font-mono text-[0.65rem] uppercase tracking-[0.12em] text-[#6366f1]">
                 Upcoming Reminder
               </p>
-              <p className="mt-2 text-sm leading-relaxed text-slate-200">{upcomingReminder}</p>
+              <p className="mt-2 text-sm leading-relaxed text-[#f3f4f6]">{upcomingReminder}</p>
             </div>
           </div>
         </div>

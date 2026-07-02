@@ -30,7 +30,7 @@ def adapt_schedule():
         "topics": []
     })
 
-    # Prepare reasoning prompt for study schedule optimization
+   
     prompt = f"""
 You are an AI study planner tracking Gauthami's progress. Based on the overall roadmap, today's schedule, and the exact completed vs. missed tasks in progress.json, intelligently generate a reorganized schedule block for tomorrow.
 Rules: Do not overload the user. Prioritize unfinished or failed tasks (e.g., if Trees are repeatedly marked incomplete, schedule 'Trees Revision' and 'Easy Tree Problems' tomorrow and proactively shift advanced topics like Graphs or DP later into the timeline). Maintain foundational learning order. Output raw JSON only matching our schedule schema.
@@ -70,7 +70,6 @@ Return ONLY a raw valid JSON string (no markdown formatting, no code block marke
         response = llm.invoke(prompt)
         content = response.content.strip()
 
-        # Clean the output to ensure valid JSON is parsed
         if "```" in content:
             match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', content)
             if match:
@@ -78,9 +77,9 @@ Return ONLY a raw valid JSON string (no markdown formatting, no code block marke
 
         parsed_json = json.loads(content)
 
-        # Basic schema validation
+       
         if isinstance(parsed_json, dict) and "today" in parsed_json and "tomorrow" in parsed_json:
-            # Persist reorganized schedule block directly back into schedule.json
+    
             os.makedirs(os.path.dirname(SCHEDULE_FILE), exist_ok=True)
             with open(SCHEDULE_FILE, "w") as f:
                 json.dump(parsed_json, f, indent=4)
