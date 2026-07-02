@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { LayoutDashboard, MessageSquare, Map, User } from "lucide-react";
+import { LayoutDashboard, MessageSquare, Map, User, FileText } from "lucide-react";
 
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./components/Dashboard";
 import ChatBotUI from "./components/ChatBotUI";
 import Roadmaps from "./components/Roadmaps";
+import AtsScanner from "./components/AtsScanner";
 
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -13,6 +14,7 @@ const VIEWS = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "chat", label: "AI Chat", icon: MessageSquare },
   { id: "roadmaps", label: "Roadmaps", icon: Map },
+  { id: "ats", label: "ATS Scanner", icon: FileText },
   { id: "profile", label: "Integrations", icon: User },
 ];
 
@@ -23,10 +25,10 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const urlToken = params.get("token");
-    if (urlToken) {
-      localStorage.setItem("token", urlToken);
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    if (token) {
+      localStorage.setItem("token", token);
       window.history.replaceState({}, document.title, window.location.pathname);
     }
     fetchUserProfile();
@@ -40,12 +42,17 @@ function App() {
       return;
     }
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
     try {
       const res = await fetch("http://localhost:8000/api/auth/me", {
+        signal: controller.signal,
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+      clearTimeout(timeoutId);
       if (res.ok) {
         const userData = await res.json();
         setUser(userData);
@@ -55,9 +62,23 @@ function App() {
       }
     } catch (err) {
       console.error("Failed to load user profile:", err);
+      localStorage.removeItem("token");
+      setUser(null);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSandboxBypass = () => {
+    localStorage.setItem("token", "mock_developer_jwt_token_payload");
+    setUser({
+      email: "developer@agentix.ai",
+      displayName: "Dev Gauthami",
+      googleId: "mock-google-id-12345",
+      github: null,
+      leetcode: null
+    });
+    setLoading(false);
   };
 
   const handleLogout = () => {
@@ -78,7 +99,7 @@ function App() {
   }
 
   if (!user) {
-    return <AuthPage />;
+    return <AuthPage onBypass={handleSandboxBypass} />;
   }
 
   return (
@@ -97,6 +118,7 @@ function App() {
           <ChatBotUI setHasNewRoadmapNotification={setHasNewRoadmapNotification} />
         )}
         {view === "roadmaps" && <Roadmaps />}
+        {view === "ats" && <AtsScanner />}
         {view === "profile" && (
           <ProfilePage user={user} setUser={setUser} onLogout={handleLogout} />
         )}

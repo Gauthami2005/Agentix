@@ -1,12 +1,16 @@
 import React from "react";
 
-export default function AuthPage() {
+export default function AuthPage({ onBypass }) {
   const handleGoogleLogin = () => {
     window.location.href = "http://localhost:8000/api/auth/google";
   };
 
   const handleSandboxBypass = () => {
-    window.location.href = "http://localhost:8000/api/auth/google/callback?code=mock_dev_oauth_code";
+    if (onBypass) {
+      onBypass();
+    } else {
+      window.location.href = "http://localhost:8000/api/auth/google/callback?code=mock_dev_oauth_code";
+    }
   };
 
   return (

@@ -35,7 +35,11 @@ def extract_text_from_file(file_bytes: bytes, filename: str) -> str:
         return ""
 
 def compute_keyword_score(resume_text: str, job_desc: str) -> tuple[float, list[str], list[str]]:
-    job_desc_words = set(re.findall(r'\b[a-zA-Z0-9+-]+\b', job_desc.lower()))
+    # Convert to lowercase and strip punctuation
+    job_desc_clean = re.sub(r'[^\w\s+-]', ' ', job_desc.lower())
+    resume_clean = re.sub(r'[^\w\s+-]', ' ', resume_text.lower())
+    
+    job_desc_words = set(re.findall(r'\b[a-zA-Z0-9+-]+\b', job_desc_clean))
     matched_job_keywords = job_desc_words.intersection(CORE_COMPETENCIES)
     
     if not matched_job_keywords:
@@ -45,13 +49,12 @@ def compute_keyword_score(resume_text: str, job_desc: str) -> tuple[float, list[
     if not matched_job_keywords:
         return 100.0, [], []
         
-    resume_text_lower = resume_text.lower()
     matched_keywords = []
     missing_keywords = []
     
-    for kw in matched_job_keywords:
+    for kw in sorted(list(matched_job_keywords)):
         pattern = r'\b' + re.escape(kw) + r'\b'
-        if re.search(pattern, resume_text_lower) or (not kw.isalnum() and kw in resume_text_lower):
+        if re.search(pattern, resume_clean) or (not kw.isalnum() and kw in resume_clean):
             matched_keywords.append(kw)
         else:
             missing_keywords.append(kw)
@@ -137,8 +140,6 @@ async def ats_score(
         """
         
         llm_semantic_score = 70.0
-        llm_matched = []
-        llm_missing = []
         actionable_fixes = []
         
         try:
@@ -150,22 +151,21 @@ async def ats_score(
                     content = match.group(1).strip()
             data = json.loads(content)
             llm_semantic_score = float(data.get("semanticScore", 70.0))
-            llm_matched = data.get("matchedKeywords", [])
-            llm_missing = data.get("missingKeywords", [])
             actionable_fixes = data.get("actionableFixes", [])
         except Exception as e:
             print(f"Error calling LLM for ATS scoring: {e}")
             
         # 4. Weight Integration Matrix
-        final_score = int(round((keyword_pct * 0.5) + (structural_score * 0.2) + (llm_semantic_score * 0.3)))
-        
-        all_matched = list(set(math_matched + [k.lower() for k in llm_matched]))
-        all_missing = list(set(math_missing + [k.lower() for k in llm_missing]))
+        final_score = int(round((keyword_pct * 0.50) + (structural_score * 0.20) + (llm_semantic_score * 0.30)))
         
         return {
+            "finalScore": final_score,
             "score": final_score,
-            "matchedKeywords": all_matched,
-            "missingKeywords": all_missing,
+            "keywordMatchDensity": int(round(keyword_pct)),
+            "structuralLayoutIntegrity": int(round(structural_score)),
+            "semanticRecruiterImpact": int(round(llm_semantic_score)),
+            "matchedKeywords": math_matched,
+            "missingKeywords": math_missing,
             "formattingCritique": formatting_critique,
             "actionableFixes": actionable_fixes
         }
