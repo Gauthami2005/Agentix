@@ -509,6 +509,36 @@
                     "content": "Parsed intent: Extracted index #324. No Selenium driver available. Default browser opened https://leetcode.com/problems/wiggle-sort-ii/."
                 }
             ]
+        },
+        {
+            "id": "bc02698c-195c-45a3-9327-7207d8971d69",
+            "title": "whats my name",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "whats my name"
+                },
+                {
+                    "role": "assistant",
+                    "content": "I don't have any information about your name as our conversation has just begun. You haven't told me your name yet. If you'd like to share it with me, I'd be happy to know."
+                },
+                {
+                    "role": "user",
+                    "content": "can u read form my profile"
+                },
+                {
+                    "role": "assistant",
+                    "content": "You haven't shared your profile with me yet. This conversation just started, and I'm a text-based AI assistant. If you'd like to share something from your profile, feel free to paste it here, and I'll be happy to help."
+                },
+                {
+                    "role": "user",
+                    "content": "from the profile i logined"
+                },
+                {
+                    "role": "assistant",
+                    "content": "It seems like you're trying to access information from a profile you logged in to. However, I'm a large language model, I don't have the capability to store or access personal information about individual users, including profiles.\n\nIf you'd like to discuss something related to your profile or need help with a specific task, I'm here to assist you. Please let me know how I can help."
+                }
+            ]
         }
     ]
 }

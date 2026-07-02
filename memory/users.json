@@ -24,21 +24,18 @@
     "email": "developer@agentix.ai",
     "displayName": "Dev Gauthami",
     "googleId": "mock-google-id-12345",
-    "github": {
-      "accessToken": "simulated_token_mock_github_code",
-      "username": "github-dev-gauthami",
-      "connectedAt": "2026-07-02T10:51:04.404730"
-    },
-    "leetcode": {
-      "username": "mock_developer",
-      "totalSolved": 142,
-      "badges": [
-        "Knight",
-        "2026 Daily Problem"
-      ],
-      "connectedAt": "2026-07-02T10:51:22.408221"
-    },
+    "github": null,
+    "leetcode": null,
     "createdAt": "2026-07-02T10:50:35.198325",
     "picture": "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+  },
+  "gauthami72005@gmail.com": {
+    "email": "gauthami72005@gmail.com",
+    "displayName": "Gauthami Poojary",
+    "googleId": "107037074462054293677",
+    "picture": "https://lh3.googleusercontent.com/a/ACg8ocIFr4gUERYRjmLGJPHLsG5yUe3UqHLO4BobU6e5CuvAyRvOvhqa=s96-c",
+    "github": null,
+    "leetcode": null,
+    "createdAt": "2026-07-02T11:10:39.714232"
   }
 }

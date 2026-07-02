@@ -1,0 +1,175 @@
+import io
+import re
+import os
+import json
+import requests
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from pypdf import PdfReader
+from planner import llm
+
+router = APIRouter(prefix="/api/resume", tags=["resume"])
+
+CORE_COMPETENCIES = {
+    "react", "typescript", "javascript", "nodejs", "node", "python", "mongodb", "aws", 
+    "docker", "kubernetes", "golang", "java", "c++", "rust", "mysql", "postgresql", 
+    "sqlite", "html", "css", "vue", "angular", "express", "fastapi", "django", "flask", 
+    "git", "linux", "cloud", "serverless", "graphql", "redis", "jenkins", "cicd", "terraform"
+}
+
+def extract_text_from_file(file_bytes: bytes, filename: str) -> str:
+    if filename.lower().endswith(".pdf"):
+        try:
+            reader = PdfReader(io.BytesIO(file_bytes))
+            text = ""
+            for page in reader.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+            return text
+        except Exception as e:
+            print(f"Error extracting PDF: {e}")
+            
+    try:
+        return file_bytes.decode("utf-8", errors="ignore")
+    except Exception:
+        return ""
+
+def compute_keyword_score(resume_text: str, job_desc: str) -> tuple[float, list[str], list[str]]:
+    job_desc_words = set(re.findall(r'\b[a-zA-Z0-9+-]+\b', job_desc.lower()))
+    matched_job_keywords = job_desc_words.intersection(CORE_COMPETENCIES)
+    
+    if not matched_job_keywords:
+        STOPWORDS = {"the", "and", "a", "of", "to", "in", "is", "for", "with", "on", "as", "by", "at", "an", "be", "this", "that", "from", "are", "we", "our", "you"}
+        matched_job_keywords = {w for w in job_desc_words if w not in STOPWORDS and len(w) > 2}
+        
+    if not matched_job_keywords:
+        return 100.0, [], []
+        
+    resume_text_lower = resume_text.lower()
+    matched_keywords = []
+    missing_keywords = []
+    
+    for kw in matched_job_keywords:
+        pattern = r'\b' + re.escape(kw) + r'\b'
+        if re.search(pattern, resume_text_lower) or (not kw.isalnum() and kw in resume_text_lower):
+            matched_keywords.append(kw)
+        else:
+            missing_keywords.append(kw)
+            
+    intersection_pct = (len(matched_keywords) / len(matched_job_keywords)) * 100.0 if matched_job_keywords else 100.0
+    return intersection_pct, matched_keywords, missing_keywords
+
+def compute_structural_score(resume_text: str) -> tuple[float, str]:
+    sections = {
+        "experience": ["experience", "employment", "work history", "professional experience"],
+        "education": ["education", "academic", "university", "college"],
+        "skills": ["skills", "technical skills", "skills & core competencies", "technologies"],
+        "projects": ["projects", "personal projects", "key projects", "academic projects"]
+    }
+    
+    resume_text_lower = resume_text.lower()
+    missing_sections_count = 0
+    
+    for sec_key, sec_aliases in sections.items():
+        found = False
+        for alias in sec_aliases:
+            if alias in resume_text_lower:
+                found = True
+                break
+        if not found:
+            missing_sections_count += 1
+            
+    structural_score = max(0.0, 100.0 - (missing_sections_count * 25.0))
+    
+    formatting_critique = ""
+    tabular_matches = re.findall(r'\s{4,}', resume_text)
+    bar_matches = re.findall(r'\|', resume_text)
+    
+    if len(tabular_matches) > 15 or len(bar_matches) > 10:
+        formatting_critique = "Warning: Multi-column structure or excessive tabular layout fragments detected. This might disrupt parser readability."
+    else:
+        formatting_critique = "Structure looks solid. Single column layout preferred for maximum ATS compatibility."
+        
+    return structural_score, formatting_critique
+
+@router.post("/ats-score")
+async def ats_score(
+    resume: UploadFile = File(...),
+    jobDescription: str = Form(...)
+):
+    try:
+        file_bytes = await resume.read()
+        resume_text = extract_text_from_file(file_bytes, resume.filename)
+        
+        if not resume_text.strip():
+            raise HTTPException(status_code=400, detail="Could not extract text from the resume file.")
+            
+        # 1. Compute keyword score (Mathematical Tier - 50%)
+        keyword_pct, math_matched, math_missing = compute_keyword_score(resume_text, jobDescription)
+        
+        # 2. Compute structural score (Structural Tier - 20%)
+        structural_score, formatting_critique = compute_structural_score(resume_text)
+        
+        # 3. LLM semantic score (Semantic Tier - 30%)
+        prompt = f"""
+        Act as an elite corporate technical recruiter scanner. Evaluate the quality of the candidate's experience descriptions. Look for quantifiable metrics, action verbs, and core technical project execution depth.
+        
+        Job Description:
+        {jobDescription}
+        
+        Resume Text:
+        {resume_text}
+        
+        Output a semantic alignment score between 0 and 100, a string list of matchedKeywords, a string list of missingKeywords, and a clean array of actionableFixes.
+        
+        You MUST respond with a valid JSON object matching the following schema and nothing else:
+        {{
+          "semanticScore": 85,
+          "matchedKeywords": ["react", "typescript"],
+          "missingKeywords": ["aws", "docker"],
+          "actionableFixes": [
+            "Include quantifiable metrics showing the impact of React optimization.",
+            "Add Docker containerization experience if applicable to the Projects section."
+          ]
+        }}
+        
+        Do not add any markdown blocks, introductory or concluding text. Output only the pure JSON.
+        """
+        
+        llm_semantic_score = 70.0
+        llm_matched = []
+        llm_missing = []
+        actionable_fixes = []
+        
+        try:
+            response = llm.invoke(prompt)
+            content = response.content.strip()
+            if "```" in content:
+                match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', content)
+                if match:
+                    content = match.group(1).strip()
+            data = json.loads(content)
+            llm_semantic_score = float(data.get("semanticScore", 70.0))
+            llm_matched = data.get("matchedKeywords", [])
+            llm_missing = data.get("missingKeywords", [])
+            actionable_fixes = data.get("actionableFixes", [])
+        except Exception as e:
+            print(f"Error calling LLM for ATS scoring: {e}")
+            
+        # 4. Weight Integration Matrix
+        final_score = int(round((keyword_pct * 0.5) + (structural_score * 0.2) + (llm_semantic_score * 0.3)))
+        
+        all_matched = list(set(math_matched + [k.lower() for k in llm_matched]))
+        all_missing = list(set(math_missing + [k.lower() for k in llm_missing]))
+        
+        return {
+            "score": final_score,
+            "matchedKeywords": all_matched,
+            "missingKeywords": all_missing,
+            "formattingCritique": formatting_critique,
+            "actionableFixes": actionable_fixes
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"ATS Scoring pipeline error: {str(e)}")

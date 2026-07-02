@@ -14,6 +14,7 @@ from memory.schedule_manager import clear_schedule
 load_dotenv()
 
 from routes.auth import router as auth_router
+from routes.resume import router as resume_router
 
 api = FastAPI(
     title="Agentix API",
@@ -22,6 +23,7 @@ api = FastAPI(
 )
 
 api.include_router(auth_router)
+api.include_router(resume_router)
 
 api.add_middleware(
     CORSMiddleware,
