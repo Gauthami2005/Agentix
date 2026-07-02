@@ -96,22 +96,20 @@ def get_driver():
             options = webdriver.ChromeOptions()
             options.add_argument("--start-maximized")
             
-            # Use persistent browser profile so the user stays logged in or can bookmark
+           
             user_data_dir = os.path.expanduser("~/.agentix_browser_profile")
             options.add_argument(f"--user-data-dir={user_data_dir}")
             
-            # Inject full stealth argument bypasses
+            
             options.add_argument("--disable-blink-features=AutomationControlled")
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
             options.add_experimental_option("useAutomationExtension", False)
             
-            # Mask user agent to look exactly like a standard modern human desktop browser
             options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
             
             service = Service(ChromeDriverManager().install())
             _driver = webdriver.Chrome(service=service, options=options)
             
-            # Execute CDP command to drop navigator.webdriver
             _driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
                 "source": "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
             })
