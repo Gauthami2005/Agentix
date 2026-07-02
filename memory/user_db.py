@@ -30,7 +30,7 @@ def save_user(user: dict):
     users[email] = user
     save_users(users)
 
-def create_or_update_google_user(email: str, display_name: str, google_id: str = None) -> dict:
+def create_or_update_google_user(email: str, display_name: str, google_id: str = None, picture: str = None) -> dict:
     email_lc = email.lower()
     user = get_user(email_lc)
     if not user:
@@ -38,6 +38,7 @@ def create_or_update_google_user(email: str, display_name: str, google_id: str =
             "email": email_lc,
             "displayName": display_name,
             "googleId": google_id,
+            "picture": picture,
             "github": None,
             "leetcode": None,
             "createdAt": datetime.utcnow().isoformat()
@@ -46,5 +47,7 @@ def create_or_update_google_user(email: str, display_name: str, google_id: str =
         user["displayName"] = display_name
         if google_id:
             user["googleId"] = google_id
+        if picture:
+            user["picture"] = picture
     save_user(user)
     return user

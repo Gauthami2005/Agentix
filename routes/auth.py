@@ -129,38 +129,43 @@ def fetch_leetcode_profile(username: str) -> dict:
 @router.get("/google")
 def google_auth():
     """Redirects the client to Google's OAuth2 authorization page or fallback developer flow."""
-    client_id = os.getenv("GOOGLE_CLIENT_ID")
-    redirect_uri = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/auth/google/callback")
-    
-    if not client_id:
-        # If client credentials are not configured, redirect straight to mock callback for seamless developer testing
-        return fastapi.responses.RedirectResponse(url=f"/api/auth/google/callback?code=mock_dev_oauth_code")
+    try:
+        client_id = os.getenv("GOOGLE_CLIENT_ID")
+        redirect_uri = os.getenv("GOOGLE_CALLBACK_URL", "http://localhost:8000/api/auth/google/callback")
         
-    google_url = (
-        "https://accounts.google.com/o/oauth2/v2/auth"
-        f"?response_type=code&client_id={client_id}"
-        f"&redirect_uri={urllib.parse.quote(redirect_uri)}"
-        "&scope=openid%20email%20profile"
-    )
-    import fastapi.responses
-    return fastapi.responses.RedirectResponse(url=google_url)
+        if not client_id:
+            import fastapi.responses
+            return fastapi.responses.RedirectResponse(url=f"/api/auth/google/callback?code=mock_dev_oauth_code")
+            
+        google_url = (
+            "https://accounts.google.com/o/oauth2/v2/auth"
+            f"?client_id={client_id}"
+            f"&redirect_uri={urllib.parse.quote(redirect_uri)}"
+            "&response_type=code"
+            "&scope=openid%20profile%20email"
+        )
+        import fastapi.responses
+        return fastapi.responses.RedirectResponse(url=google_url)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to initiate Google OAuth: {str(e)}")
 
 @router.get("/google/callback")
 def google_callback(code: str = Query(...)):
     """Handles callback, exchanges code for user profile, finds/creates user, and redirects to frontend with JWT."""
     client_id = os.getenv("GOOGLE_CLIENT_ID")
     client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
-    redirect_uri = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/auth/google/callback")
+    redirect_uri = os.getenv("GOOGLE_CALLBACK_URL", "http://localhost:8000/api/auth/google/callback")
     
     email = None
     display_name = None
     google_id = None
+    picture = None
     
-    # Check if developer simulation code is provided
     if code == "mock_dev_oauth_code" or not client_id or not client_secret:
         email = "developer@agentix.ai"
         display_name = "Dev Gauthami"
         google_id = "mock-google-id-12345"
+        picture = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
     else:
         try:
             token_url = "https://oauth2.googleapis.com/token"
@@ -187,16 +192,17 @@ def google_callback(code: str = Query(...)):
                         email = user_info.get("email")
                         display_name = user_info.get("name") or user_info.get("given_name")
                         google_id = user_info.get("sub")
+                        picture = user_info.get("picture")
         except Exception as e:
             print(f"Google OAuth Callback error: {e}")
             
     if not email:
-        # Fallback to dev account if real Google connection fails to keep app functional
         email = "developer@agentix.ai"
         display_name = "Dev Gauthami"
         google_id = "mock-google-id-12345"
+        picture = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
         
-    user = create_or_update_google_user(email, display_name, google_id)
+    user = create_or_update_google_user(email, display_name, google_id, picture)
     token = generate_jwt({"email": user["email"], "displayName": user["displayName"]})
     
     import fastapi.responses
