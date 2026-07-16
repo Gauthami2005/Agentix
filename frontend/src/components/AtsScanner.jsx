@@ -65,7 +65,7 @@ export default function AtsScanner() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12 items-start">
-        {/* Form Panel */}
+        {}
         <form onSubmit={handleSubmit} className="space-y-6 lg:col-span-5 rounded-xl border border-[#22252a] bg-[#121316] p-6">
           <h3 className="text-lg font-semibold border-b border-[#22252a] pb-3">Analyze Candidate Metrics</h3>
           
@@ -120,11 +120,11 @@ export default function AtsScanner() {
           )}
         </form>
 
-        {/* Dashboard Results Panel */}
+        {}
         <div className="lg:col-span-7 space-y-6">
           {result ? (
             <div className="space-y-6">
-              {/* Score Header Card */}
+              {}
               <div className="rounded-xl border border-[#22252a] bg-[#121316] p-6 text-center">
                 <p className="text-xs font-semibold text-[#9ca3af] uppercase tracking-wider">Calculated ATS Score</p>
                 <div className="mt-4 flex items-center justify-center">
@@ -137,14 +137,14 @@ export default function AtsScanner() {
                 </p>
               </div>
 
-              {/* 1. MULTI-METRIC PERFORMANCE BREAKDOWN ROWS */}
+              {}
               <div className="rounded-xl border border-[#22252a] bg-[#121316] p-6 space-y-5">
                 <h4 className="text-sm font-semibold uppercase tracking-wider text-[#9ca3af] border-b border-[#22252a] pb-2">
                   Performance Breakdown
                 </h4>
                 
                 <div className="space-y-4">
-                  {/* Row 1: Keyword Match Density */}
+                  {}
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-sm">
                       <span className="font-medium">Keyword Match Density <span className="text-[#9ca3af] text-xs">(50% Core Weight)</span></span>
@@ -155,7 +155,7 @@ export default function AtsScanner() {
                     </div>
                   </div>
 
-                  {/* Row 2: Structural Layout Integrity */}
+                  {}
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-sm">
                       <span className="font-medium">Structural Layout Integrity <span className="text-[#9ca3af] text-xs">(20% Core Weight)</span></span>
@@ -166,7 +166,7 @@ export default function AtsScanner() {
                     </div>
                   </div>
 
-                  {/* Row 3: Semantic Impact Grade */}
+                  {}
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-sm">
                       <span className="font-medium">Semantic Recruiter Impact <span className="text-[#9ca3af] text-xs">(30% Core Weight)</span></span>
@@ -179,7 +179,7 @@ export default function AtsScanner() {
                 </div>
               </div>
 
-              {/* 2. REFINED ISSUES TIMELINE ROW (AMBER ALERT BOX) */}
+              {}
               {(isTabular || structuralScore < 100) && (
                 <div className="rounded-xl bg-[#1c1b12] border border-[#3a321d] p-5 text-[#f59e0b] space-y-2">
                   <div className="flex items-center gap-2">
@@ -192,14 +192,14 @@ export default function AtsScanner() {
                 </div>
               )}
 
-              {/* 3. KEYWORD MAP CHIPS */}
+              {}
               <div className="rounded-xl border border-[#22252a] bg-[#121316] p-6 space-y-4">
                 <h4 className="text-sm font-semibold uppercase tracking-wider text-[#9ca3af] border-b border-[#22252a] pb-2">
                   Keyword Mapping Status
                 </h4>
 
                 <div className="flex flex-wrap gap-2">
-                  {/* Matched Keywords */}
+                  {}
                   {result.matchedKeywords.map((kw) => (
                     <span key={kw} className="inline-flex items-center gap-1 px-3 py-1.5 text-xs rounded-full bg-[#141519] border border-[#22252a] text-[#f3f4f6]">
                       <Check size={12} className="text-[#6366f1]" />
@@ -207,7 +207,7 @@ export default function AtsScanner() {
                     </span>
                   ))}
                   
-                  {/* Missing Keywords */}
+                  {}
                   {result.missingKeywords.map((kw) => (
                     <span key={kw} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full bg-[#1c1212] border border-[#3a1d1d] text-[#f87171]">
                       <AlertTriangle size={12} className="text-[#f87171]" />
@@ -217,7 +217,7 @@ export default function AtsScanner() {
                 </div>
               </div>
 
-              {/* 4. ACTIONABLE FIXES */}
+              {}
               {result.actionableFixes && result.actionableFixes.length > 0 && (
                 <div className="rounded-xl border border-[#22252a] bg-[#121316] p-6 space-y-4">
                   <h4 className="text-sm font-semibold uppercase tracking-wider text-[#9ca3af] border-b border-[#22252a] pb-2">

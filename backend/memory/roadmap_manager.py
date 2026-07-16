@@ -23,7 +23,6 @@ def load_roadmaps():
 def save_roadmaps(data):
     """Safely save the roadmaps to memory/roadmap.json."""
     try:
-        # Ensure parent directories exist
         os.makedirs(os.path.dirname(ROADMAP_FILE), exist_ok=True)
         with open(ROADMAP_FILE, "w") as f:
             json.dump(data, f, indent=4)
@@ -66,7 +65,6 @@ def toggle_roadmap_topic(roadmap_id: str, phase_title: str, topic_name: str, com
             break
 
     if not target_rm and data.get("roadmaps", []):
-        # fallback to the latest
         target_rm = data["roadmaps"][-1]
 
     if target_rm:

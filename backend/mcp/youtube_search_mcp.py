@@ -3,7 +3,6 @@ import urllib.parse
 import re
 import json
 
-# Curated fallback educational videos
 CURATED_FALLBACKS = [
     {
         "keywords": ["graph", "bfs", "dfs", "dijkstra", "kruskal", "prim"],
@@ -55,7 +54,6 @@ def search_youtube_resources(topic_query: str) -> str:
     if not query:
         return json.dumps([])
 
-    # 1. Attempt Live YouTube Search Scraping
     try:
         encoded_query = urllib.parse.quote(query + " educational tutorial")
         url = f"https://www.youtube.com/results?search_query={encoded_query}"
@@ -66,7 +64,6 @@ def search_youtube_resources(topic_query: str) -> str:
         with urllib.request.urlopen(req, timeout=5) as response:
             html = response.read().decode('utf-8')
 
-        # Find ytInitialData javascript object
         pattern = r"ytInitialData\s*=\s*(\{.*?\});"
         match = re.search(pattern, html)
         if not match:
@@ -105,7 +102,6 @@ def search_youtube_resources(topic_query: str) -> str:
     except Exception as e:
         print(f"Live YouTube search error: {e}")
 
-    # 2. Fallback to Curated Matches
     query_lower = query.lower()
     matches = []
     for item in CURATED_FALLBACKS:
@@ -121,7 +117,6 @@ def search_youtube_resources(topic_query: str) -> str:
         if len(matches) >= 3:
             break
 
-    # If no specific match, return a general default set of high quality videos
     if not matches:
         matches = [
             {

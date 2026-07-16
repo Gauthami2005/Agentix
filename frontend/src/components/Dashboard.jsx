@@ -63,12 +63,32 @@ function tryParseRoadmap(roadmapStr) {
       return data;
     }
   } catch (e) {
-    // ignore
   }
   return null;
 }
 
-export default function Dashboard({ setView }) {
+export default function Dashboard({ setView, user, isGuest }) {
+  const userName = useMemo(() => {
+    const token = localStorage.getItem("token");
+    if (!token || !user || isGuest) {
+      return null;
+    }
+    const baseName = user.email ? user.email.split("@")[0] : (user.displayName || "");
+    const parts = baseName.split(/[._\-\s]+/);
+    const cleanParts = parts.filter(part => !/\d/.test(part) && part.length > 0);
+    if (cleanParts.length === 0) {
+      const fallbackParts = (user.displayName || "").split(/[._\-\s]+/);
+      const cleanFallback = fallbackParts.filter(part => !/\d/.test(part) && part.length > 0);
+      if (cleanFallback.length > 0) {
+        return cleanFallback.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
+      }
+      return "User";
+    }
+    return cleanParts
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  }, [user, isGuest]);
+
   const [roadmaps, setRoadmaps] = useState([]);
   const [activeRoadmapId, setActiveRoadmapId] = useState("");
   const [taskSource, setTaskSource] = useState("fallback");
@@ -132,7 +152,6 @@ export default function Dashboard({ setView }) {
     loadData();
   }, [loadData]);
 
-  // Synchronize activeTasks from active roadmap or defaults with completed states from backend
   useEffect(() => {
     if (activeRoadmap?.roadmap) {
       const parsedRoadmap = tryParseRoadmap(activeRoadmap.roadmap);
@@ -220,7 +239,6 @@ export default function Dashboard({ setView }) {
     return Math.round((totalCompleted / totalObjectives) * 100);
   }, [totalObjectives, totalCompleted]);
 
-  // Keep these legacy metrics variables so they don't break fallback renderings if any
   const completedCount = dailyCompletedCount;
   const progressPct = unifiedProgressPct;
 
@@ -270,7 +288,6 @@ export default function Dashboard({ setView }) {
     const isCompleted = completedList.includes(topicName);
     const nextCompleted = !isCompleted;
 
-    // 1. Optimistic UI update locally
     setRoadmaps((prevRoadmaps) => {
       return prevRoadmaps.map((r) => {
         if (r.id === activeRoadmapId) {
@@ -284,7 +301,6 @@ export default function Dashboard({ setView }) {
       });
     });
 
-    // 2. Persist to backend database
     try {
       const result = await completeRoadmapTopic(
         activeRoadmapId,
@@ -397,7 +413,18 @@ export default function Dashboard({ setView }) {
                 </button>
               </div>
               <h1 className="text-3xl font-bold tracking-tight text-[#f3f4f6] sm:text-4xl">
-                {greeting()} Gauthami
+                {userName ? (
+                  <>
+                    {greeting()},{" "}
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-neon to-emerald-neon font-extrabold">
+                      {userName}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-neon via-[#818cf8] to-emerald-neon animate-pulse font-extrabold tracking-wide drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]">
+                    Hello Guest
+                  </span>
+                )}
               </h1>
               <p className="text-sm text-[#9ca3af]">
                 LangGraph + MCP agent ready · {formatDate()}

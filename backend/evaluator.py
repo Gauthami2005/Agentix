@@ -8,8 +8,6 @@ def evaluator_node(state):
     result = state.get("result", "")
     plan = state.get("plan", "")
 
-    # Rule 1: Tool Fallback
-    # If the tool node was not run, or returned a "no tool found" error, or direct system error
     if not result or "No suitable tool found for" in result or "Error:" in result:
         print("[Evaluator] Tool Fallback triggered.")
         fallback_prompt = f"""
@@ -27,7 +25,6 @@ Do NOT output any technical or system errors.
         response = llm.invoke(fallback_prompt)
         formatted_result = response.content
     else:
-        # Rule 2: Markdown Re-formatting & Strip Raw Symbols
         stripped_res = result.strip()
         is_raw_structure = (
             (stripped_res.startswith("[") and stripped_res.endswith("]")) or 
@@ -57,8 +54,6 @@ Follow these rules:
         else:
             formatted_result = result
 
-    # Rule 3: Strip Raw Symbols Safeguard
-    # If the output starts with raw list brackets, parse or strip them
     formatted_result = formatted_result.strip()
     if formatted_result.startswith("[") and formatted_result.endswith("]"):
         try:
@@ -66,11 +61,9 @@ Follow these rules:
             if isinstance(parsed, list):
                 formatted_result = "\n".join(f"- {item}" for item in parsed)
         except Exception:
-            # Fallback manual stripping
             formatted_result = formatted_result.lstrip("[").rstrip("]")
             formatted_result = formatted_result.replace("', '", "\n- ").replace('", "', "\n- ").replace("'", "").replace('"', "")
 
-    # Final sweep: check if there's any stray starting bracket and quotes
     if formatted_result.startswith("['") or formatted_result.startswith("[\""):
         formatted_result = formatted_result.replace("['", "").replace("']", "").replace('["', '').replace('"]', '')
 

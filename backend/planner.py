@@ -4,8 +4,7 @@ import os
 
 from mcp.roadmap_manager import save_roadmap
 
-# Load environment variables
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
@@ -48,7 +47,6 @@ Strip out any conversational filler, introductory remarks, markdown formatting s
     response = llm.invoke(prompt)
     content = response.content.strip()
 
-    # Clean the output to ensure valid JSON is parsed
     import re
     if "```" in content:
         match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', content)
@@ -57,7 +55,6 @@ Strip out any conversational filler, introductory remarks, markdown formatting s
 
     roadmap = content
 
-    # Save roadmap for later use with extracted title
     title = task
     try:
         import json

@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime
 
-USER_DB_FILE = "/Users/gauthami/Desktop/Agent/memory/users.json"
+USER_DB_FILE = "/Users/gauthami/Desktop/Agent/backend/memory/users.json"
 
 def load_users() -> dict:
     if not os.path.exists(USER_DB_FILE):

@@ -1,6 +1,8 @@
 from typing import Any, Optional
-
+import os
 from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -10,8 +12,6 @@ from memory.memory_manager import add_message, create_session
 from mcp.daily_task_mcp import today_tasks
 from mcp.roadmap_manager import load_roadmaps, clear_roadmaps
 from memory.schedule_manager import clear_schedule
-
-load_dotenv()
 
 from routes.auth import router as auth_router
 from routes.resume import router as resume_router
@@ -185,7 +185,6 @@ def get_tasks() -> TasksResponse:
     from memory.schedule_manager import load_schedule, save_schedule
     sched = load_schedule()
 
-    # If today's list is empty, initialize it from raw today_tasks()
     if not sched.get("today") or len(sched["today"]) == 0:
         raw = today_tasks()
         if isinstance(raw, list):
@@ -210,13 +209,10 @@ def toggle_task_endpoint(req: ToggleTaskRequest) -> dict[str, Any]:
         from mcp.progress_mcp import update_progress
         from memory.progress_manager import calculate_progress
 
-        # 1. Update schedule.json
         toggle_task(req.task, req.completed)
 
-        # 2. Update progress.json
         update_progress(req.task, req.completed)
 
-        # 3. Calculate and return updated progress metrics
         progress_data = calculate_progress()
         return {
             "status": "success",
@@ -235,14 +231,11 @@ def complete_task_endpoint(req: CompleteTaskRequest) -> dict[str, Any]:
         from mcp.adaptive_planner_mcp import adapt_schedule
         from memory.progress_manager import calculate_progress
 
-        # a) Update status inside schedule.json and progress.json
         toggle_task(req.task_name, req.completed)
         update_progress(req.task_name, req.completed)
 
-        # b) Fire adapt_schedule() to run LLM optimization and c) save to schedule.json
         new_schedule = adapt_schedule()
 
-        # Recalculate progress metrics
         progress_data = calculate_progress()
 
         return {

@@ -23,7 +23,6 @@ function tryParseRoadmap(roadmapStr) {
       return data;
     }
   } catch (e) {
-    // ignore
   }
   return null;
 }
@@ -290,7 +289,7 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
       )}
 
       <div className="relative flex min-h-0 flex-1 flex-col">
-        {/* Header */}
+        {}
         <header className="shrink-0 border-b border-[#22252a] bg-[#121316]/50 px-4 py-4 sm:px-6">
           <div className="mx-auto flex max-w-4xl items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#22252a] bg-[#1c1d22]">
@@ -310,7 +309,7 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
           </div>
         </header>
 
-        {/* Messages */}
+        {}
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6">
           <div className="mx-auto flex max-w-4xl flex-col gap-6">
             {messages.length === 0 && !isLoading && <WelcomeBanner />}
@@ -329,10 +328,10 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
           </div>
         </div>
 
-        {/* Input dock */}
+        {}
         <footer className="shrink-0 border-t border-[#22252a] bg-[#121316]/50 px-4 py-4 sm:px-6">
           <form onSubmit={handleSubmit} className="mx-auto max-w-4xl">
-            {/* Quick-action chips */}
+            {}
             <div className="mb-3 flex flex-wrap gap-2">
               {QUICK_PROMPTS.map((prompt) => (
                 <button
@@ -347,7 +346,7 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
               ))}
             </div>
 
-            {/* Mode selection bar */}
+            {}
             <div className="mb-3 flex gap-2">
               <button
                 type="button"
@@ -373,7 +372,7 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
               </button>
             </div>
 
-            {/* Input container with focus glow */}
+            {}
             <div
               className={`rounded-2xl border bg-[#141519]/50 p-1 transition-all duration-300 ${isFocused
                 ? "border-[#6366f1] shadow-[0_4px_20px_rgba(0,0,0,0.4)]"

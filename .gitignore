@@ -9,4 +9,5 @@ __pycache__/
 *.pyc
 
 # macOS files
-.DS_Store
+.DS_Storebackend/memory/users.json
+backend/memory/users.json

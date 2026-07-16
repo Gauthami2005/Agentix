@@ -35,7 +35,6 @@ def extract_text_from_file(file_bytes: bytes, filename: str) -> str:
         return ""
 
 def compute_keyword_score(resume_text: str, job_desc: str) -> tuple[float, list[str], list[str]]:
-    # Convert to lowercase and strip punctuation
     job_desc_clean = re.sub(r'[^\w\s+-]', ' ', job_desc.lower())
     resume_clean = re.sub(r'[^\w\s+-]', ' ', resume_text.lower())
     
@@ -107,13 +106,10 @@ async def ats_score(
         if not resume_text.strip():
             raise HTTPException(status_code=400, detail="Could not extract text from the resume file.")
             
-        # 1. Compute keyword score (Mathematical Tier - 50%)
         keyword_pct, math_matched, math_missing = compute_keyword_score(resume_text, jobDescription)
         
-        # 2. Compute structural score (Structural Tier - 20%)
         structural_score, formatting_critique = compute_structural_score(resume_text)
         
-        # 3. LLM semantic score (Semantic Tier - 30%)
         prompt = f"""
         Act as an elite corporate technical recruiter scanner. Evaluate the quality of the candidate's experience descriptions. Look for quantifiable metrics, action verbs, and core technical project execution depth.
         
@@ -155,7 +151,6 @@ async def ats_score(
         except Exception as e:
             print(f"Error calling LLM for ATS scoring: {e}")
             
-        # 4. Weight Integration Matrix
         final_score = int(round((keyword_pct * 0.50) + (structural_score * 0.20) + (llm_semantic_score * 0.30)))
         
         return {

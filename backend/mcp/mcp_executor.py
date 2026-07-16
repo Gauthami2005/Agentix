@@ -20,7 +20,6 @@ def execute_tool(task):
 
             func = tool["function"]
 
-            # Browser Automation MCP
             if selected_tool == "browser_automation":
                 from planner import llm
                 parsing_prompt = f"""
@@ -46,7 +45,6 @@ def execute_tool(task):
                     problem_name = task
                 return func(intent_type, problem_name, task)
 
-            # LeetCode Search MCP
             elif selected_tool == "leetcode_search":
 
                 if "graph" in task_lower:
@@ -61,15 +59,12 @@ def execute_tool(task):
                 else:
                     return func("dynamic-programming")
 
-            # Daily Task MCP
             elif selected_tool == "daily_task":
                 return func()
 
-            # Daily Scheduler MCP
             elif selected_tool == "daily_scheduler":
                 return func()
 
-            # YouTube Search MCP
             elif selected_tool == "youtube_search":
                 return func(task)
 

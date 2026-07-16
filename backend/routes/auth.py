@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 import re
 import hmac
 import hashlib
@@ -6,9 +7,12 @@ import base64
 import json
 import requests
 import urllib.parse
+import httpx
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+import anyio
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Header
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from memory.user_db import create_or_update_google_user, get_user, save_user
 
@@ -16,6 +20,7 @@ router = APIRouter(prefix="/api/auth", tags=["authentication"])
 
 JWT_SECRET = os.getenv("JWT_SECRET", "agentix-super-jwt-secret-key-12345")
 security = HTTPBearer()
+httpx_client = httpx.AsyncClient()
 
 class LinkGithubRequest(BaseModel):
     code: str
@@ -67,7 +72,7 @@ def verify_jwt(token: str) -> dict:
     except Exception:
         return None
 
-def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
     token = credentials.credentials
     payload = verify_jwt(token)
     if not payload or "email" not in payload:
@@ -76,7 +81,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
             detail="Invalid or expired authorization token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    user = get_user(payload["email"])
+    user = await anyio.to_thread.run_sync(get_user, payload["email"])
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
@@ -123,7 +128,6 @@ def fetch_leetcode_profile(username: str) -> dict:
                 }
     except Exception as e:
         print(f"Error querying LeetCode GraphQL: {e}")
-    # Local fallback/stub to simulate behavior in isolated dev environments
     return {"exists": False}
 
 @router.get("/google")
@@ -150,8 +154,7 @@ def google_auth():
         raise HTTPException(status_code=500, detail=f"Failed to initiate Google OAuth: {str(e)}")
 
 @router.get("/google/callback")
-def google_callback(code: str = Query(...)):
-    """Handles callback, exchanges code for user profile, finds/creates user, and redirects to frontend with JWT."""
+async def google_callback(code: str = Query(...)):
     client_id = os.getenv("GOOGLE_CLIENT_ID")
     client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
     redirect_uri = os.getenv("GOOGLE_CALLBACK_URL", "http://localhost:8000/api/auth/google/callback")
@@ -176,16 +179,16 @@ def google_callback(code: str = Query(...)):
                 "grant_type": "authorization_code",
                 "redirect_uri": redirect_uri
             }
-            res = requests.post(token_url, data=data, timeout=5)
+            res = await httpx_client.post(token_url, data=data, timeout=5.0)
             if res.status_code == 200:
                 token_data = res.json()
                 access_token = token_data.get("access_token")
                 
                 if access_token:
-                    user_res = requests.get(
+                    user_res = await httpx_client.get(
                         "https://www.googleapis.com/oauth2/v3/userinfo",
                         headers={"Authorization": f"Bearer {access_token}"},
-                        timeout=5
+                        timeout=5.0
                     )
                     if user_res.status_code == 200:
                         user_info = user_res.json()
@@ -202,11 +205,12 @@ def google_callback(code: str = Query(...)):
         google_id = "mock-google-id-12345"
         picture = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
         
-    user = create_or_update_google_user(email, display_name, google_id, picture)
+    user = await anyio.to_thread.run_sync(
+        create_or_update_google_user, email, display_name, google_id, picture
+    )
     token = generate_jwt({"email": user["email"], "displayName": user["displayName"]})
     
-    import fastapi.responses
-    return fastapi.responses.RedirectResponse(url=f"http://localhost:5173/?token={token}")
+    return RedirectResponse(url=f"http://localhost:5173/?token={token}")
 
 @router.post("/link/github")
 def link_github(req: LinkGithubRequest, current_user: dict = Depends(get_current_user)):
@@ -268,7 +272,6 @@ def link_leetcode(req: LinkLeetcodeRequest, current_user: dict = Depends(get_cur
         
     profile = fetch_leetcode_profile(username)
     if not profile or not profile.get("exists"):
-        # Let's provide a simulation helper for testing username parameters locally:
         if username.startswith("mock_"):
             profile = {
                 "exists": True,
@@ -296,10 +299,11 @@ def get_me(current_user: dict = Depends(get_current_user)):
     return current_user
 
 @router.post("/unlink/github")
-def unlink_github(current_user: dict = Depends(get_current_user)):
-    from memory.user_db import save_user
+@router.post("/github/disconnect")
+@router.get("/github/disconnect")
+async def unlink_github(current_user: dict = Depends(get_current_user)):
     current_user["github"] = None
-    save_user(current_user)
+    await anyio.to_thread.run_sync(save_user, current_user)
     return {
         "status": "success",
         "message": "Successfully unlinked GitHub account",
@@ -307,14 +311,127 @@ def unlink_github(current_user: dict = Depends(get_current_user)):
     }
 
 @router.post("/unlink/leetcode")
-def unlink_leetcode(current_user: dict = Depends(get_current_user)):
-    from memory.user_db import save_user
+async def unlink_leetcode(current_user: dict = Depends(get_current_user)):
     current_user["leetcode"] = None
-    save_user(current_user)
+    await anyio.to_thread.run_sync(save_user, current_user)
     return {
         "status": "success",
         "message": "Successfully unlinked LeetCode profile",
         "user": current_user
     }
+
+@router.get("/github")
+async def github_auth(token: str = Query(None)):
+    client_id = os.getenv("GITHUB_CLIENT_ID")
+    if not client_id:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="GITHUB_CLIENT_ID environment variable is missing"
+        )
+    state_param = f"&state={token}" if token else ""
+    github_url = f"https://github.com/login/oauth/authorize?client_id={client_id}&scope=repo%20user&prompt=consent{state_param}"
+    return RedirectResponse(url=github_url)
+
+@router.get("/github/callback")
+async def github_callback(code: str = Query(None), state: str = Query(None), authorization: Optional[str] = Header(None)):
+    if not code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Authorization code is missing"
+        )
+        
+    token = state
+    if not token and authorization:
+        if authorization.startswith("Bearer "):
+            token = authorization.split(" ")[1]
+            
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Active session token is required to link GitHub account"
+        )
+        
+    payload = verify_jwt(token)
+    if not payload or "email" not in payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired session token"
+        )
+        
+    user = await anyio.to_thread.run_sync(get_user, payload["email"])
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User account not found"
+        )
+        
+    client_id = os.getenv("GITHUB_CLIENT_ID")
+    client_secret = os.getenv("GITHUB_CLIENT_SECRET")
+    
+    if not client_id or not client_secret:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="GitHub environment variables are missing"
+        )
+        
+    try:
+        token_res = await httpx_client.post(
+            "https://github.com/login/oauth/access_token",
+            json={
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "code": code
+            },
+            headers={"Accept": "application/json"},
+            timeout=10.0
+        )
+        token_res.raise_for_status()
+        token_data = token_res.json()
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Failed to communicate with GitHub token endpoint: {str(e)}"
+        )
+        
+    access_token = token_data.get("access_token")
+    if not access_token:
+        error_desc = token_data.get("error_description", "Unknown error")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"GitHub token exchange failed: {error_desc}"
+        )
+        
+    try:
+        user_res = await httpx_client.get(
+            "https://api.github.com/user",
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "User-Agent": "Agentix-App"
+            },
+            timeout=10.0
+        )
+        user_res.raise_for_status()
+        user_data = user_res.json()
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Failed to fetch user profile from GitHub: {str(e)}"
+        )
+        
+    username = user_data.get("login")
+    if not username:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Failed to retrieve GitHub username from profile data"
+        )
+        
+    user["github"] = {
+        "accessToken": access_token,
+        "username": username,
+        "connectedAt": datetime.utcnow().isoformat()
+    }
+    await anyio.to_thread.run_sync(save_user, user)
+        
+    return RedirectResponse(url="http://localhost:5173/?view=profile&github_connected=true")
 
 

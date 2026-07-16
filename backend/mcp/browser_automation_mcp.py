@@ -8,7 +8,6 @@ import webbrowser
 import re
 import requests
 
-# Global variable to hold driver reference
 _driver = None
 _leetcode_cache = None
 
@@ -132,7 +131,6 @@ def execute_browser_workflow(intent_type: str, problem_name: str = "", user_mess
     print(f"Executing browser workflow: {intent} for problem: {prob} (Message: {full_message})")
     
     if intent == "solve_leetcode":
-        # TIER 1: FLEXIBLE NUMBER EXTRACTION (Regex Layer)
         number_match = re.search(r'\b\d+\b', full_message)
         if number_match:
             num_str = number_match.group(0)
@@ -152,7 +150,6 @@ def execute_browser_workflow(intent_type: str, problem_name: str = "", user_mess
                     webbrowser.open(direct_url)
                     return f"Parsed intent: Extracted index #{num}. No Selenium driver available. Default browser opened {direct_url}."
         
-        # TIER 2: FUZZY STRING & TITLE MATCHING (Slug Generator)
         target_name = prob if prob else full_message
         cleaned_target = re.sub(r'\b(open|solve|leetcode|question|show|find|give\s+me)\b', '', target_name, flags=re.IGNORECASE).strip()
         if not cleaned_target:
@@ -173,7 +170,6 @@ def execute_browser_workflow(intent_type: str, problem_name: str = "", user_mess
                 webbrowser.open(direct_url)
                 return f"Parsed intent: Title match '{cleaned_target}' resolved to slug '{slug}'. No Selenium driver available. Default browser opened {direct_url}."
         
-        # TIER 3: STEALTH FALLBACK WEB SEARCH (For complex open queries)
         url = "https://www.google.com/search?q=" + urllib.parse.quote(f"{full_message} LeetCode")
         driver = get_driver()
         if driver:

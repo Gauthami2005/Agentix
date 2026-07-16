@@ -56,36 +56,15 @@ export default function ProfilePage({ user, setUser, onLogout }) {
     }
   };
 
-  const handleLinkGithubMock = async () => {
-    setIsLinkingGithub(true);
-    setGithubError("");
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8000/api/auth/link/github", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ code: "mock_github_code" }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setUser(data.user);
-      } else {
-        setGithubError(data.detail || "Failed to link GitHub account.");
-      }
-    } catch (err) {
-      setGithubError("Network error. Please try again.");
-    } finally {
-      setIsLinkingGithub(false);
-    }
+  const handleLinkGithub = () => {
+    const token = localStorage.getItem("token");
+    window.location.href = `http://localhost:8000/api/auth/github?token=${token}`;
   };
 
   const handleUnlinkGithub = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8000/api/auth/unlink/github", {
+      const res = await fetch("http://localhost:8000/api/auth/github/disconnect", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -96,7 +75,7 @@ export default function ProfilePage({ user, setUser, onLogout }) {
         setUser(data.user);
       }
     } catch (err) {
-      console.error("Failed to unlink GitHub:", err);
+      console.error("Failed to disconnect GitHub:", err);
     }
   };
 
@@ -117,7 +96,7 @@ export default function ProfilePage({ user, setUser, onLogout }) {
       </div>
 
       <div className="space-y-6">
-        {/* Row 1 (Master): Google Account Session */}
+        {}
         <div className="rounded-xl border border-[#22252a] bg-[#121316] p-6">
           <div className="flex items-start justify-between">
             <div className="flex gap-4">
@@ -143,7 +122,7 @@ export default function ProfilePage({ user, setUser, onLogout }) {
           </div>
         </div>
 
-        {/* Row 2 (Code Pipeline): GitHub Sync */}
+        {}
         <div className="rounded-xl border border-[#22252a] bg-[#121316] p-6">
           <div className="flex items-start justify-between">
             <div className="flex gap-4">
@@ -163,11 +142,10 @@ export default function ProfilePage({ user, setUser, onLogout }) {
                     </span>
                   ) : (
                     <button
-                      onClick={handleLinkGithubMock}
-                      disabled={isLinkingGithub}
-                      className="px-4 py-2 text-sm font-semibold rounded-lg bg-[#1c1d22] border border-[#22252a] text-[#f3f4f6] hover:bg-[#22252a] transition-all disabled:opacity-50"
+                      onClick={handleLinkGithub}
+                      className="px-4 py-2 text-sm font-semibold rounded-lg bg-[#1c1d22] border border-[#22252a] text-[#f3f4f6] hover:bg-[#22252a] transition-all"
                     >
-                      {isLinkingGithub ? "Linking Account..." : "Link GitHub Repository"}
+                      Link GitHub Repository
                     </button>
                   )}
                   {githubError && (
@@ -188,7 +166,7 @@ export default function ProfilePage({ user, setUser, onLogout }) {
           </div>
         </div>
 
-        {/* Row 3 (Progress Metrics): LeetCode Metrics Link */}
+        {}
         <div className="rounded-xl border border-[#22252a] bg-[#121316] p-6">
           <div className="flex items-start justify-between">
             <div className="flex gap-4">

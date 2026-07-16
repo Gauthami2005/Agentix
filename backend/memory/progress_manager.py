@@ -56,7 +56,6 @@ def calculate_progress():
     progress = load_progress()
     roadmaps_data = load_roadmaps()
 
-    # Parse total tasks from the last active roadmap
     total_tasks = 0
     roadmap_tasks = []
     if roadmaps_data.get("roadmaps"):
@@ -74,11 +73,8 @@ def calculate_progress():
 
     completed_task_names = progress.get("completed_task_names", [])
     
-    # Filter completed tasks that are actually part of the roadmap
-    # to avoid exceeding 100% progress
     roadmap_completed_count = 0
     if roadmap_tasks:
-        # Match task names flexibly by cleaning
         def clean_key(txt):
             return re.sub(r'[^a-zA-Z0-9]', '', txt).lower()
         
@@ -89,7 +85,6 @@ def calculate_progress():
     else:
         roadmap_completed_count = len(completed_task_names)
 
-    # Check topic completion based on completed task names keywords
     topics = []
     for topic_name in DEFAULT_TOPICS:
         completed = False
@@ -114,7 +109,6 @@ def calculate_progress():
     progress["completed_tasks"] = roadmap_completed_count
     progress["topics"] = topics
 
-    # Calculate overall progress percentage
     overall_progress = 0
     if total_tasks > 0:
         overall_progress = round((roadmap_completed_count * 100) / total_tasks)

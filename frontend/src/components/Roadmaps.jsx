@@ -15,7 +15,6 @@ function tryParseRoadmap(roadmapStr) {
       return data;
     }
   } catch (e) {
-    // ignore
   }
   return null;
 }
@@ -70,7 +69,6 @@ export default function Roadmaps() {
     loadRoadmaps();
   }, [loadRoadmaps]);
 
-  // Parse roadmap string into lines/sections for rendering
   const parsedSteps = selectedRoadmap
     ? selectedRoadmap.roadmap
         .split("\n")
@@ -130,7 +128,7 @@ export default function Roadmaps() {
           </div>
         ) : (
           <div className="grid gap-8 md:grid-cols-[250px_1fr]">
-            {/* Sidebar list of roadmaps */}
+            {}
             <div className="space-y-3">
               <p className="font-mono text-[0.65rem] uppercase tracking-wider text-[#9ca3af] px-1">
                 Saved Sprints
@@ -162,7 +160,7 @@ export default function Roadmaps() {
               </div>
             </div>
 
-            {/* Detailed Roadmap content */}
+            {}
             <div className="rounded-2xl border border-[#22252a] bg-[#121316] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
               {selectedRoadmap && (
                 <div>

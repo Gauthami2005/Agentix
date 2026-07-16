@@ -1,17 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 
-export default function AuthPage({ onBypass }) {
+export default function AuthPage({ onGuest }) {
+  const [loading, setLoading] = useState(false);
+
   const handleGoogleLogin = () => {
+    setLoading(true);
     window.location.href = "http://localhost:8000/api/auth/google";
   };
 
-  const handleSandboxBypass = () => {
-    if (onBypass) {
-      onBypass();
-    } else {
-      window.location.href = "http://localhost:8000/api/auth/google/callback?code=mock_dev_oauth_code";
-    }
+  const handleGuestLogin = () => {
+    setLoading(true);
+    onGuest();
   };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0b0c0e] px-4">
+        <div className="w-full max-w-md rounded-xl border border-[#22252a] bg-[#121316] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.6)] flex flex-col items-center justify-center text-center space-y-6">
+          <div className="relative flex items-center justify-center h-16 w-16">
+            <div className="absolute inset-0 rounded-full border-4 border-cyan-neon/10 border-t-cyan-neon animate-spin" />
+            <div className="h-8 w-8 rounded-full border-4 border-emerald-neon/10 border-b-emerald-neon animate-spin [animation-direction:reverse] [animation-duration:1.5s]" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold tracking-tight text-[#f3f4f6] animate-pulse">Connecting to Gateway...</h2>
+            <p className="text-xs text-[#9ca3af] font-mono">Initializing secure handshake protocol</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#0b0c0e] px-4">
@@ -40,17 +57,11 @@ export default function AuthPage({ onBypass }) {
             Continue with Google
           </button>
 
-          <div className="relative flex py-2 items-center">
-            <div className="flex-grow border-t border-[#22252a]"></div>
-            <span className="flex-shrink mx-4 text-xs text-[#4b5563] uppercase font-mono">Sandbox Dev</span>
-            <div className="flex-grow border-t border-[#22252a]"></div>
-          </div>
-
           <button
-            onClick={handleSandboxBypass}
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#22252a] bg-[#141519] px-4 py-3 text-sm font-semibold text-[#f3f4f6] transition-all hover:bg-[#1c1d22] active:scale-[0.98]"
+            onClick={handleGuestLogin}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-[#22252a]/60 bg-[#121316] px-4 py-3 text-sm font-semibold text-[#9ca3af] transition-all hover:bg-[#141519] hover:text-[#f3f4f6] active:scale-[0.98]"
           >
-            Bypass Google Login (Sandbox Developer Mode)
+            Continue as Guest
           </button>
         </div>
       </div>

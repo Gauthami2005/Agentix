@@ -24,11 +24,20 @@ function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [isGuest, setIsGuest] = useState(false);
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
     if (token) {
       localStorage.setItem("token", token);
+    }
+    const githubConnected = urlParams.get("github_connected");
+    const viewParam = urlParams.get("view");
+    if (githubConnected === "true" || viewParam === "profile") {
+      setView("profile");
+    }
+    if (token || githubConnected === "true" || viewParam) {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
     fetchUserProfile();
@@ -84,6 +93,7 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     setUser(null);
+    setIsGuest(false);
     setView("dashboard");
   };
 
@@ -98,8 +108,8 @@ function App() {
     );
   }
 
-  if (!user) {
-    return <AuthPage onBypass={handleSandboxBypass} />;
+  if (!user && !isGuest) {
+    return <AuthPage onBypass={handleSandboxBypass} onGuest={() => setIsGuest(true)} />;
   }
 
   return (
@@ -111,9 +121,10 @@ function App() {
         hasNewRoadmapNotification={hasNewRoadmapNotification}
         setHasNewRoadmapNotification={setHasNewRoadmapNotification}
         user={user}
+        isGuest={isGuest}
       />
       <main className="flex-1 h-full overflow-y-auto min-w-0">
-        {view === "dashboard" && <Dashboard setView={setView} />}
+        {view === "dashboard" && <Dashboard setView={setView} user={user} isGuest={isGuest} />}
         {view === "chat" && (
           <ChatBotUI setHasNewRoadmapNotification={setHasNewRoadmapNotification} />
         )}

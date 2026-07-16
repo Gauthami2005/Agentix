@@ -20,7 +20,6 @@ except Exception as exc:
     AGENT_AVAILABLE = False
     AGENT_ERROR = str(exc)
 
-# ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Agentix",
     page_icon="⚡",
@@ -28,7 +27,6 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── Global cyber-dark theme ──────────────────────────────────────────────────
 st.markdown(
     """
 <style>
@@ -166,7 +164,6 @@ h1, h2, h3 {
 }
 
 /* Hide default Streamlit header/footer chrome */
-#MainMenu { visibility: hidden; }
 footer { visibility: hidden; }
 header[data-testid="stHeader"] {
     background: transparent !important;
@@ -751,7 +748,6 @@ def render_settings() -> None:
         st.rerun()
 
 
-# ── Sidebar navigation ───────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown(
         """
@@ -783,7 +779,6 @@ with st.sidebar:
     else:
         st.caption("🔴 Agent offline")
 
-# ── Route pages ──────────────────────────────────────────────────────────────
 ROUTES = {
     "🏠 Dashboard": render_dashboard,
     "💬 AI Chat": render_ai_chat,

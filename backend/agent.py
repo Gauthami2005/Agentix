@@ -2,10 +2,8 @@ import sys
 import os
 from dotenv import load_dotenv
 
-# Load env variables explicitly at startup
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
-# Verify GROQ_API_KEY
 if not os.environ.get("GROQ_API_KEY"):
     print("ERROR: GROQ_API_KEY environment variable is not set. Please check your .env file.", file=sys.stderr)
 
@@ -34,7 +32,6 @@ workflow.set_entry_point("planner")
 workflow.add_edge("planner", "tool")
 workflow.add_edge("tool", "evaluator")
 
-# Loop logic
 def decide(state):
     if state["status"] == "done":
         return END
