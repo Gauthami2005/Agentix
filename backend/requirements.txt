@@ -48,3 +48,4 @@ selenium
 webdriver-manager
 pypdf
 streamlit
+python-multipart
