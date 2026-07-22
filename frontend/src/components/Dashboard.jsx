@@ -250,6 +250,8 @@ export default function Dashboard({ setView, user, isGuest }) {
     if (parsedRoadmap) {
       return parsedRoadmap.phases.map(phase => phase.phase_title).slice(0, 5);
     }
+    const isJsonString = activeRoadmap.roadmap.trim().startsWith('{') || activeRoadmap.roadmap.trim().startsWith('[');
+    if (isJsonString) return [];
     return activeRoadmap.roadmap
       .split("\n")
       .map((line) => line.trim())
@@ -364,9 +366,11 @@ export default function Dashboard({ setView, user, isGuest }) {
     setError(null);
     try {
       await clearRoadmap();
+      localStorage.removeItem('agentix_roadmap');
       setRoadmaps([]);
       setActiveRoadmapId("");
       setTasks([]);
+      setTomorrowTasks([]);
       setTaskSource("fallback");
       setProgress({
         completed_tasks: 0,
@@ -641,11 +645,7 @@ export default function Dashboard({ setView, user, isGuest }) {
                 </ol>
               ) : (
                 <p className="text-sm text-[#9ca3af]">
-                  No roadmap saved yet. Ask the AI agent to generate one via{" "}
-                  <code className="rounded bg-[#141519] px-1.5 py-0.5 font-mono text-xs text-[#6366f1]">
-                    POST /api/chat
-                  </code>
-                  .
+                  No active roadmap saved yet. Ask the AI agent in AI Chat to generate one for you.
                 </p>
               )}
             </Card>
