@@ -46,3 +46,5 @@ langchain-groq
 pymongo
 selenium
 webdriver-manager
+pypdf
+streamlit
