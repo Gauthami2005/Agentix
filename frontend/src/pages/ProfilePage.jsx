@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { LogOut, Globe, Trophy, CheckCircle } from "lucide-react";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://agentix-backend-zvm0.onrender.com";
+import { API_BASE_URL } from "../config";
 
 export default function ProfilePage({ user, setUser, onLogout }) {
   const [leetcodeUsername, setLeetcodeUsername] = useState("");

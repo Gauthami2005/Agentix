@@ -1,13 +1,12 @@
 import React, { useState } from "react";
-
-const API_BASE_URL = "https://agentix-backend-zvm0.onrender.com";
+import { API_BASE_URL } from "../config";
 
 export default function AuthPage({ onGuest }) {
   const [loading, setLoading] = useState(false);
 
   const handleGoogleLogin = () => {
     setLoading(true);
-    window.location.href = "https://agentix-backend-zvm0.onrender.com/api/auth/google";
+    window.location.href = `${API_BASE_URL}/api/auth/google`;
   };
 
   const handleGuestLogin = () => {

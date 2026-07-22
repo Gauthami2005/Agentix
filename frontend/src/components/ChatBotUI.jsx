@@ -188,7 +188,7 @@ function TypingIndicator() {
   );
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://agentix-backend-zvm0.onrender.com";
+import { API_BASE_URL } from "../config";
 
 export default function ChatBotUI({ user, setHasNewRoadmapNotification }) {
   const [messages, setMessages] = useState([]);

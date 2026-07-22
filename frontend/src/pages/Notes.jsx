@@ -137,7 +137,7 @@ const CATEGORIES = [
   { name: "General Notes", color: "from-[#ec4899] to-[#db2777]", border: "border-[#ec4899]/30 hover:border-[#ec4899]", text: "text-[#ec4899]", bg: "bg-[#ec4899]/10" }
 ];
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://agentix-backend-zvm0.onrender.com";
+import { API_BASE_URL } from "../config";
 
 async function fetchFromApi(endpoint, options = {}) {
   const token = localStorage.getItem("token");

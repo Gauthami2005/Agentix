@@ -20,7 +20,7 @@ const VIEWS = [
   { id: "profile", label: "Integrations", icon: User },
 ];
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://agentix-backend-zvm0.onrender.com";
+import { API_BASE_URL } from "./config";
 
 function App() {
   const [view, setView] = useState("dashboard");

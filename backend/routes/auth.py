@@ -212,7 +212,8 @@ def google_auth():
     """Redirects the client to Google's OAuth2 authorization page or fallback developer flow."""
     try:
         client_id = os.getenv("GOOGLE_CLIENT_ID")
-        redirect_uri = "https://agentix-backend-zvm0.onrender.com/api/auth/google/callback"
+        BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+        redirect_uri = f"{BACKEND_URL}/api/auth/google/callback"
         
         if not client_id:
             import fastapi.responses
@@ -236,7 +237,8 @@ async def google_callback(code: str = Query(...)):
     try:
         client_id = os.getenv("GOOGLE_CLIENT_ID")
         client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
-        redirect_uri = "https://agentix-backend-zvm0.onrender.com/api/auth/google/callback"
+        BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+        redirect_uri = f"{BACKEND_URL}/api/auth/google/callback"
         
         email = None
         display_name = None
@@ -290,7 +292,8 @@ async def google_callback(code: str = Query(...)):
         print(f"⚡ Google OAuth callback successful for user: {user.get('email')}")
         token = generate_jwt({"email": user["email"], "displayName": user["displayName"]})
         
-        return RedirectResponse(url=f"http://localhost:5173/dashboard?token={token}")
+        FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+        return RedirectResponse(url=f"{FRONTEND_URL}/dashboard?token={token}")
     except Exception as e:
         print("❌ Error encountered in google_callback:")
         traceback.print_exc()
@@ -566,7 +569,7 @@ async def github_callback(code: str = Query(None), state: str = Query(None), aut
         "repositories_count": len(repos_list)
     }
     await anyio.to_thread.run_sync(save_user, user)
-        
-    return RedirectResponse(url="http://localhost:5173/?view=profile&github_connected=true")
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+    return RedirectResponse(url=f"{FRONTEND_URL}/?view=profile&github_connected=true")
 
 

@@ -130,13 +130,18 @@ def startup_event():
         print(f"\n⚠️  MongoDB verification warning/error: {e}")
         print("Please check your MONGO_URI value in backend/.env to ensure a healthy connection.\n")
 
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://agentix-agentixx.vercel.app",
+]
+if FRONTEND_URL not in origins:
+    origins.append(FRONTEND_URL)
+
 api.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "https://agentix-agentixx.vercel.app",
-    ],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
