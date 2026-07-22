@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://agentix-backend-zvm0.onrender.com";
+
 export default function AuthPage({ onGuest }) {
   const [loading, setLoading] = useState(false);
 
   const handleGoogleLogin = () => {
     setLoading(true);
-    window.location.href = "http://localhost:8000/api/auth/google";
+    window.location.href = `${API_BASE_URL}/api/auth/google`;
   };
 
   const handleGuestLogin = () => {

@@ -20,6 +20,8 @@ const VIEWS = [
   { id: "profile", label: "Integrations", icon: User },
 ];
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://agentix-backend-zvm0.onrender.com";
+
 function App() {
   const [view, setView] = useState("dashboard");
   const [hasNewRoadmapNotification, setHasNewRoadmapNotification] = useState(false);
@@ -57,7 +59,7 @@ function App() {
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
     try {
-      const res = await fetch("http://localhost:8000/api/auth/me", {
+      const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
         signal: controller.signal,
         credentials: "include",
         headers: {

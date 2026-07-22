@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { FileText, Upload, Sparkles, Check, AlertTriangle, ArrowRight, CheckCircle2 } from "lucide-react";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://agentix-backend-zvm0.onrender.com";
+
 export default function AtsScanner({ user }) {
   const [resumeFile, setResumeFile] = useState(null);
   const [jobDescription, setJobDescription] = useState("");
@@ -72,7 +74,7 @@ export default function AtsScanner({ user }) {
     formData.append("jobDescription", jobDescription.trim());
 
     try {
-      const res = await fetch("http://localhost:8000/api/resume/ats-score", {
+      const res = await fetch(`${API_BASE_URL}/api/resume/ats-score`, {
         method: "POST",
         body: formData,
       });

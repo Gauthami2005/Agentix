@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { LogOut, Globe, Trophy, CheckCircle } from "lucide-react";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://agentix-backend-zvm0.onrender.com";
+
 export default function ProfilePage({ user, setUser, onLogout }) {
   const [leetcodeUsername, setLeetcodeUsername] = useState("");
   const [isLinkingLeetcode, setIsLinkingLeetcode] = useState(false);
@@ -36,7 +38,7 @@ export default function ProfilePage({ user, setUser, onLogout }) {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8000/api/auth/leetcode/link", {
+      const res = await fetch(`${API_BASE_URL}/api/auth/leetcode/link`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -61,7 +63,7 @@ export default function ProfilePage({ user, setUser, onLogout }) {
   const handleUnlinkLeetcode = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8000/api/auth/unlink/leetcode", {
+      const res = await fetch(`${API_BASE_URL}/api/auth/unlink/leetcode`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -78,13 +80,13 @@ export default function ProfilePage({ user, setUser, onLogout }) {
 
   const handleLinkGithub = () => {
     const token = localStorage.getItem("token");
-    window.location.href = `http://localhost:8000/api/auth/github?token=${token}`;
+    window.location.href = `${API_BASE_URL}/api/auth/github?token=${token}`;
   };
 
   const handleUnlinkGithub = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8000/api/auth/github/disconnect", {
+      const res = await fetch(`${API_BASE_URL}/api/auth/github/disconnect`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
