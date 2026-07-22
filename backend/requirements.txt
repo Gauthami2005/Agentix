@@ -45,3 +45,4 @@ zstandard==0.25.0
 langchain-groq
 pymongo
 selenium
+webdriver-manager
