@@ -26,7 +26,7 @@ export default function AtsScanner({ user }) {
     setResumeBullets([]);
 
     try {
-      const res = await fetch("http://localhost:5001/api/review/resume-bullets", {
+      const res = await fetch(`${API_BASE_URL}/api/review/resume-bullets`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

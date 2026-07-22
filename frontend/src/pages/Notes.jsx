@@ -137,18 +137,29 @@ const CATEGORIES = [
   { name: "General Notes", color: "from-[#ec4899] to-[#db2777]", border: "border-[#ec4899]/30 hover:border-[#ec4899]", text: "text-[#ec4899]", bg: "bg-[#ec4899]/10" }
 ];
 
-let apiPort = "5000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://agentix-backend-zvm0.onrender.com";
 
 async function fetchFromApi(endpoint, options = {}) {
-  try {
-    return await fetch(`http://localhost:${apiPort}/api/notes${endpoint}`, options);
-  } catch (err) {
-    if (apiPort === "5000") {
-      apiPort = "5001";
-      return await fetch(`http://localhost:${apiPort}/api/notes${endpoint}`, options);
-    }
-    throw err;
+  const token = localStorage.getItem("token");
+  const headers = {
+    "Content-Type": "application/json",
+    ...options.headers,
+  };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
   }
+
+  const res = await fetch(`${API_BASE_URL}/api/notes${endpoint}`, {
+    ...options,
+    headers,
+    credentials: "include"
+  });
+
+  if (!res.ok) {
+    const detail = await res.text();
+    throw new Error(detail || `Request failed: ${res.status}`);
+  }
+  return res.json();
 }
 
 export default function Notes() {

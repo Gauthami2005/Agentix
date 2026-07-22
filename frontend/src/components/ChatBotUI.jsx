@@ -188,6 +188,8 @@ function TypingIndicator() {
   );
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://agentix-backend-zvm0.onrender.com";
+
 export default function ChatBotUI({ user, setHasNewRoadmapNotification }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -215,7 +217,7 @@ export default function ChatBotUI({ user, setHasNewRoadmapNotification }) {
   useEffect(() => {
     const fetchExpressRepos = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/repos");
+        const res = await fetch(`${API_BASE_URL}/api/repos`);
         if (res.ok) {
           const data = await res.json();
           if (data && Array.isArray(data.repositories)) {
