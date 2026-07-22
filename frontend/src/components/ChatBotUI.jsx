@@ -449,16 +449,6 @@ export default function ChatBotUI({ user, setHasNewRoadmapNotification }) {
                 >
                   🔥 Honest Reviewer
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setActivePersona("cyberpunk_os")}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-300 cursor-pointer ${activePersona === "cyberpunk_os"
-                    ? "border-[#6366f1] bg-[#6366f1]/5 shadow-[0_0_15px_rgba(99,102,241,0.2)] text-[#f3f4f6]"
-                    : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
-                    }`}
-                >
-                  🌐 Cyberpunk OS
-                </button>
               </div>
             )}
 
