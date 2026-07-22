@@ -7,9 +7,21 @@ An autonomous, agentic learning ecosystem that transforms a dark-mode developer 
 ### Project Architecture
 ![Project Architecture](./architecture_diagram.jpg)
 
-### System Workflows
-![Roadmap Timeline](./roadmap_image.jpg)
+## Current Backend Flow
 
+```text
+User Request / Document / GitHub Link
+   ↓
+Context & File Parsing
+   ↓
+Agent Persona & Tool Dispatch
+   ↓
+LLM Inference & Schema Cleaning
+   ↓
+Database Persistence (MongoDB)
+   ↓
+Structured JSON Response
+```
 ---
 
 ## 🚀 Core Features
