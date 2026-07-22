@@ -212,8 +212,8 @@ def google_auth():
     """Redirects the client to Google's OAuth2 authorization page or fallback developer flow."""
     try:
         client_id = os.getenv("GOOGLE_CLIENT_ID")
-        backend_url = os.getenv("BACKEND_URL", "https://agentix-backend-zvm0.onrender.com")
-        redirect_uri = f"{backend_url}/api/auth/google/callback"
+        BACKEND_URL = os.getenv("BACKEND_URL", "https://agentix-backend-zvm0.onrender.com")
+        redirect_uri = f"{BACKEND_URL}/api/auth/google/callback"
         
         if not client_id:
             import fastapi.responses
@@ -237,8 +237,8 @@ async def google_callback(code: str = Query(...)):
     try:
         client_id = os.getenv("GOOGLE_CLIENT_ID")
         client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
-        backend_url = os.getenv("BACKEND_URL", "https://agentix-backend-zvm0.onrender.com")
-        redirect_uri = f"{backend_url}/api/auth/google/callback"
+        BACKEND_URL = os.getenv("BACKEND_URL", "https://agentix-backend-zvm0.onrender.com")
+        redirect_uri = f"{BACKEND_URL}/api/auth/google/callback"
         
         email = None
         display_name = None

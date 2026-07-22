@@ -10,9 +10,10 @@ const generateResumeBullets = async (req, res) => {
 
         let bulletPoints = [];
 
+        const BACKEND_URL = process.env.BACKEND_URL || "https://agentix-backend-zvm0.onrender.com";
         // Route the LLM generation request to the Python FastAPI agent system
         try {
-            const response = await fetch("http://localhost:8000/api/chat", {
+            const response = await fetch(`${BACKEND_URL}/api/chat`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
