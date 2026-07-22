@@ -59,6 +59,7 @@ function App() {
     try {
       const res = await fetch("http://localhost:8000/api/auth/me", {
         signal: controller.signal,
+        credentials: "include",
         headers: {
           Authorization: `Bearer ${token}`,
         },

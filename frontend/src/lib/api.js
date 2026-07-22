@@ -1,7 +1,11 @@
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
 
-async function request(path, init) {
-  const res = await fetch(`${API_BASE}${path}`, init);
+async function request(path, init = {}) {
+  const options = {
+    ...init,
+    credentials: "include"
+  };
+  const res = await fetch(`${API_BASE}${path}`, options);
   if (!res.ok) {
     const detail = await res.text();
     throw new Error(detail || `Request failed: ${res.status}`);
