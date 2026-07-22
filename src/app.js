@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const githubRepoRouter = require('./routes/githubRepo.routes');
 const reviewRouter = require('./routes/review.routes');
+const notesRouter = require('./routes/notes.routes');
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use(express.json());
 // Mount the routers
 app.use('/api/repos', githubRepoRouter);
 app.use('/api/review', reviewRouter);
+app.use('/api/notes', notesRouter);
 
 // Fallback error handler
 app.use((err, req, res, next) => {

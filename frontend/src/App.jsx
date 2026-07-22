@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { LayoutDashboard, MessageSquare, Map, User, FileText } from "lucide-react";
+import { LayoutDashboard, MessageSquare, Map, User, FileText, StickyNote } from "lucide-react";
 
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./components/Dashboard";
 import ChatBotUI from "./components/ChatBotUI";
 import Roadmaps from "./components/Roadmaps";
 import AtsScanner from "./components/AtsScanner";
+import Notes from "./pages/Notes";
 
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -15,6 +16,7 @@ const VIEWS = [
   { id: "chat", label: "AI Chat", icon: MessageSquare },
   { id: "roadmaps", label: "Roadmaps", icon: Map },
   { id: "ats", label: "ATS Scanner", icon: FileText },
+  { id: "notes", label: "Notes", icon: StickyNote },
   { id: "profile", label: "Integrations", icon: User },
 ];
 
@@ -130,6 +132,7 @@ function App() {
         )}
         {view === "roadmaps" && <Roadmaps />}
         {view === "ats" && <AtsScanner user={user} />}
+        {view === "notes" && <Notes />}
         {view === "profile" && (
           <ProfilePage user={user} setUser={setUser} onLogout={handleLogout} />
         )}
