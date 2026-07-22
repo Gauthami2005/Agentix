@@ -7,7 +7,7 @@ export default function AuthPage({ onGuest }) {
 
   const handleGoogleLogin = () => {
     setLoading(true);
-    window.location.href = `${API_BASE_URL}/api/auth/google`;
+    window.location.href = "https://agentix-backend-zvm0.onrender.com/api/auth/google";
   };
 
   const handleGuestLogin = () => {

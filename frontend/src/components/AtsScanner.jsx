@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { FileText, Upload, Sparkles, Check, AlertTriangle, ArrowRight, CheckCircle2 } from "lucide-react";
 
-// Dynamic base URL fallback for ATS Scanner requests
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://agentix-backend-zvm0.onrender.com";
+// Production base URL for ATS Scanner requests
+const API_BASE_URL = "https://agentix-backend-zvm0.onrender.com";
 
 export default function AtsScanner({ user }) {
   const [resumeFile, setResumeFile] = useState(null);
