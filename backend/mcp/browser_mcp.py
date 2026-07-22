@@ -6,6 +6,8 @@ import time
 
 def open_leetcode(topic):
 
+    print("Opening leetcode topic: "+topic)
+
     try:
 
         driver = webdriver.Chrome(

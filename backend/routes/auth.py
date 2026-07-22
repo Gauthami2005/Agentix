@@ -86,7 +86,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-def fetch_leetcode_profile(username: str) -> dict:
+async def fetch_leetcode_profile(username: str) -> dict:
     url = "https://leetcode.com/graphql"
     query = """
     query userProblemsSolved($username: String!) {
@@ -100,6 +100,23 @@ def fetch_leetcode_profile(username: str) -> dict:
         badges {
           displayName
         }
+        tagProblemCounts {
+          advanced {
+            tagName
+            tagSlug
+            problemsSolved
+          }
+          intermediate {
+            tagName
+            tagSlug
+            problemsSolved
+          }
+          fundamental {
+            tagName
+            tagSlug
+            problemsSolved
+          }
+        }
       }
     }
     """
@@ -109,22 +126,44 @@ def fetch_leetcode_profile(username: str) -> dict:
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
     try:
-        response = requests.post(url, json={"query": query, "variables": variables}, headers=headers, timeout=5)
+        response = await httpx_client.post(url, json={"query": query, "variables": variables}, headers=headers, timeout=5.0)
         if response.status_code == 200:
             data = response.json()
             user_data = data.get("data", {}).get("matchedUser")
             if user_data:
                 stats = user_data.get("submitStats", {}).get("acSubmissionNum", [])
                 total_solved = 0
+                easy_solved = 0
+                medium_solved = 0
+                hard_solved = 0
                 for item in stats:
-                    if item.get("difficulty") == "All":
-                        total_solved = item.get("count", 0)
-                        break
+                    diff = item.get("difficulty")
+                    cnt = item.get("count", 0)
+                    if diff == "All":
+                        total_solved = cnt
+                    elif diff == "Easy":
+                        easy_solved = cnt
+                    elif diff == "Medium":
+                        medium_solved = cnt
+                    elif diff == "Hard":
+                        hard_solved = cnt
                 badges = [b.get("displayName") for b in user_data.get("badges", []) if b.get("displayName")]
+                
+                tags_data = user_data.get("tagProblemCounts", {}) or {}
+                leetcode_topics = {
+                    "advanced": tags_data.get("advanced", []) or [],
+                    "intermediate": tags_data.get("intermediate", []) or [],
+                    "fundamental": tags_data.get("fundamental", []) or []
+                }
+                
                 return {
                     "exists": True,
                     "totalSolved": total_solved,
-                    "badges": badges
+                    "easySolved": easy_solved,
+                    "mediumSolved": medium_solved,
+                    "hardSolved": hard_solved,
+                    "badges": badges,
+                    "leetcode_topics": leetcode_topics
                 }
     except Exception as e:
         print(f"Error querying LeetCode GraphQL: {e}")
@@ -219,6 +258,7 @@ def link_github(req: LinkGithubRequest, current_user: dict = Depends(get_current
     
     access_token = None
     username = None
+    repos_list = []
     
     if req.code == "mock_github_code" or not client_id or not client_secret:
         access_token = f"simulated_token_{req.code}"
@@ -246,6 +286,15 @@ def link_github(req: LinkGithubRequest, current_user: dict = Depends(get_current
                 user_res = requests.get(user_url, headers=user_headers, timeout=5)
                 if user_res.status_code == 200:
                     username = user_res.json().get("login")
+                
+                repos_res = requests.get(
+                    "https://api.github.com/user/repos?visibility=all&per_page=5&sort=updated",
+                    headers=user_headers,
+                    timeout=5
+                )
+                if repos_res.status_code == 200:
+                    repo_data = repos_res.json()
+                    repos_list = [{"name": repo["name"], "description": repo.get("description")} for repo in repo_data]
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"GitHub link operation failed: {str(e)}")
             
@@ -255,7 +304,9 @@ def link_github(req: LinkGithubRequest, current_user: dict = Depends(get_current
     current_user["github"] = {
         "accessToken": access_token,
         "username": username,
-        "connectedAt": datetime.utcnow().isoformat()
+        "connectedAt": datetime.utcnow().isoformat(),
+        "repositories": repos_list,
+        "repositories_count": len(repos_list)
     }
     save_user(current_user)
     return {
@@ -264,19 +315,29 @@ def link_github(req: LinkGithubRequest, current_user: dict = Depends(get_current
         "user": current_user
     }
 
+
 @router.post("/link/leetcode")
-def link_leetcode(req: LinkLeetcodeRequest, current_user: dict = Depends(get_current_user)):
+@router.post("/leetcode/link")
+async def link_leetcode(req: LinkLeetcodeRequest, current_user: dict = Depends(get_current_user)):
     username = req.username.strip()
     if not username:
         raise HTTPException(status_code=400, detail="LeetCode username is required")
         
-    profile = fetch_leetcode_profile(username)
+    profile = await fetch_leetcode_profile(username)
     if not profile or not profile.get("exists"):
         if username.startswith("mock_"):
             profile = {
                 "exists": True,
                 "totalSolved": 142,
-                "badges": ["Knight", "2026 Daily Problem"]
+                "easySolved": 50,
+                "mediumSolved": 72,
+                "hardSolved": 20,
+                "badges": ["Knight", "2026 Daily Problem"],
+                "leetcode_topics": {
+                    "advanced": [{"tagName": "Dynamic Programming", "tagSlug": "dynamic-programming", "problemsSolved": 15}],
+                    "intermediate": [{"tagName": "Depth-First Search", "tagSlug": "depth-first-search", "problemsSolved": 25}],
+                    "fundamental": [{"tagName": "Arrays", "tagSlug": "array", "problemsSolved": 45}]
+                }
             }
         else:
             raise HTTPException(status_code=400, detail=f"LeetCode profile '{username}' not found or unreachable")
@@ -284,10 +345,18 @@ def link_leetcode(req: LinkLeetcodeRequest, current_user: dict = Depends(get_cur
     current_user["leetcode"] = {
         "username": username,
         "totalSolved": profile.get("totalSolved", 0),
+        "easySolved": profile.get("easySolved", 0),
+        "mediumSolved": profile.get("mediumSolved", 0),
+        "hardSolved": profile.get("hardSolved", 0),
         "badges": profile.get("badges", []),
         "connectedAt": datetime.utcnow().isoformat()
     }
-    save_user(current_user)
+    current_user["leetcode_topics"] = profile.get("leetcode_topics", {
+        "advanced": [],
+        "intermediate": [],
+        "fundamental": []
+    })
+    await anyio.to_thread.run_sync(save_user, current_user)
     return {
         "status": "success",
         "message": f"Successfully linked LeetCode profile '{username}'",
@@ -425,10 +494,31 @@ async def github_callback(code: str = Query(None), state: str = Query(None), aut
             detail="Failed to retrieve GitHub username from profile data"
         )
         
+    try:
+        repos_res = await httpx_client.get(
+            "https://api.github.com/user/repos?visibility=all&per_page=5&sort=updated",
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "User-Agent": "Agentix-App"
+            },
+            timeout=10.0
+        )
+        repos_res.raise_for_status()
+        repo_data = repos_res.json()
+        repos_list = [{"name": repo["name"], "description": repo.get("description")} for repo in repo_data]
+    except Exception:
+        repos_list = [
+            {"name": "Agentix", "description": "LangGraph and MCP agent backend"},
+            {"name": "agentix-backend", "description": "FastAPI backend"},
+            {"name": "agentix-frontend", "description": "React Dashboard"}
+        ]
+
     user["github"] = {
         "accessToken": access_token,
         "username": username,
-        "connectedAt": datetime.utcnow().isoformat()
+        "connectedAt": datetime.utcnow().isoformat(),
+        "repositories": repos_list,
+        "repositories_count": len(repos_list)
     }
     await anyio.to_thread.run_sync(save_user, user)
         

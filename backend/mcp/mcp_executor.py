@@ -66,6 +66,10 @@ def execute_tool(task):
                 return func()
 
             elif selected_tool == "youtube_search":
-                return func(task)
+                import re
+                if re.search(r'youtube|video|watch|tutorial', task, re.IGNORECASE):
+                    return func(task)
+                else:
+                    return "Skipping YouTube search tool as it was not explicitly requested."
 
     return f"No suitable tool found for: {selected_tool}"

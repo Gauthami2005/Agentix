@@ -1,12 +1,50 @@
 import React, { useState } from "react";
 import { FileText, Upload, Sparkles, Check, AlertTriangle, ArrowRight, CheckCircle2 } from "lucide-react";
 
-export default function AtsScanner() {
+export default function AtsScanner({ user }) {
   const [resumeFile, setResumeFile] = useState(null);
   const [jobDescription, setJobDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+  
+  const [selectedRepo, setSelectedRepo] = useState("");
+  const [resumeBullets, setResumeBullets] = useState([]);
+  const [isGeneratingBullets, setIsGeneratingBullets] = useState(false);
+  const [bulletError, setBulletError] = useState("");
+
+  const handleGenerateBullets = async () => {
+    if (!selectedRepo) {
+      setBulletError("Please select a repository first.");
+      return;
+    }
+    setIsGeneratingBullets(true);
+    setBulletError("");
+    setResumeBullets([]);
+
+    try {
+      const res = await fetch("http://localhost:5001/api/review/resume-bullets", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({ selectedRepo })
+      });
+      const data = await res.json();
+      if (res.ok && data.status === "success") {
+        setResumeBullets(data.points || data.bullets || []);
+      } else {
+        setBulletError(data.message || "Failed to generate resume bullets.");
+      }
+    } catch (err) {
+      console.error(err);
+      setBulletError("Network error. Please make sure the Express server is running.");
+    } finally {
+      setIsGeneratingBullets(false);
+    }
+  };
+
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -56,12 +94,99 @@ export default function AtsScanner() {
   const isTabular = result?.formattingCritique?.toLowerCase().includes("warning") || false;
   const structuralScore = result ? result.structuralLayoutIntegrity : 0;
   const semanticScore = result ? result.semanticRecruiterImpact : 0;
-
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-8 bg-[#0b0c0e] min-h-screen text-[#f3f4f6]">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">ATS Resume Scanner</h1>
         <p className="text-sm text-[#9ca3af] mt-1">Verify your resume's machine-readability using our hybrid keyword and layout metrics calculator.</p>
+      </div>
+
+      {/* Resume Bullet Generator Panel */}
+      <div className="rounded-xl border border-[#22252a] bg-[#121316] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.4)] space-y-4">
+        <div>
+          <h3 className="text-base font-semibold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-cyan-neon to-[#818cf8]">
+            📄 Resume Bullet Point Generator
+          </h3>
+          <p className="text-xs text-[#9ca3af] mt-1">
+            Select a repository to dynamically generate 4 high-impact Google X-Y-Z resume points highlighting your full-stack execution.
+          </p>
+        </div>
+        
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative">
+            <select
+              value={selectedRepo}
+              onChange={(e) => setSelectedRepo(e.target.value)}
+              className="appearance-none rounded-lg border border-[#22252a] bg-[#141519] px-3.5 py-2 text-xs font-semibold text-[#f3f4f6] shadow-md transition-all duration-300 hover:border-[#6366f1]/50 focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] focus:shadow-[0_0_10px_rgba(99,102,241,0.2)] focus:outline-none cursor-pointer"
+            >
+              <option value="">Select Project Repository</option>
+              {(() => {
+                const githubRepos = user?.github?.repositories || [];
+                const activeRepos = Array.isArray(githubRepos)
+                  ? githubRepos.map(r => typeof r === "string" ? r : r?.name).filter(Boolean)
+                  : [];
+                const reposToMap = activeRepos.length > 0 
+                  ? activeRepos 
+                  : ["OceanGuard", "LingoLeap", "SiteGuard"];
+                return reposToMap.map((repoName) => (
+                  <option key={repoName} value={repoName}>
+                    {repoName}
+                  </option>
+                ));
+              })()}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#9ca3af]">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleGenerateBullets}
+            disabled={isGeneratingBullets || !selectedRepo}
+            className="flex items-center justify-center gap-2 rounded-lg bg-[#6366f1] hover:bg-[#4f46e5] px-4 py-2 text-xs font-bold text-white transition-all active:scale-[0.98] disabled:opacity-40 cursor-pointer shadow-[0_0_15px_rgba(99,102,241,0.3)] hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] border border-[#6366f1]/50"
+          >
+            {isGeneratingBullets ? (
+              <>
+                <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Generating Points...
+              </>
+            ) : (
+              <>
+                <Sparkles size={13} />
+                Generate Placement Resume Points
+              </>
+            )}
+          </button>
+        </div>
+
+        {bulletError && (
+          <p className="text-xs text-red-400 mt-2 font-mono">{bulletError}</p>
+        )}
+
+        {/* Display copy-pasteable bullet list */}
+        {resumeBullets.length > 0 && (
+          <div className="mt-4 p-4 rounded-lg bg-[#141519] border border-[#22252a] space-y-3">
+            <h4 className="text-xs font-mono uppercase tracking-wider text-[#6366f1] flex items-center justify-between">
+              <span>📋 Google X-Y-Z Formula Points (Copy-Pasteable)</span>
+              <span className="text-[10px] text-[#9ca3af] normal-case font-sans">Hover to highlight and copy</span>
+            </h4>
+            <ul className="space-y-3 pt-1">
+              {resumeBullets.map((bullet, idx) => (
+                <li key={idx} className="group relative flex gap-2.5 items-start text-xs border border-transparent hover:border-[#6366f1]/20 hover:bg-[#181a20]/50 p-2.5 rounded-md transition-all">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#1c1d22] border border-[#22252a] font-mono text-[10px] text-[#9ca3af] group-hover:text-[#6366f1] group-hover:border-[#6366f1]/40">
+                    {idx + 1}
+                  </span>
+                  <p className="leading-relaxed text-[#d1d5db] select-all cursor-text font-sans group-hover:text-[#f3f4f6]">
+                    {bullet}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12 items-start">

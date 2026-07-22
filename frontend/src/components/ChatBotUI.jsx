@@ -12,6 +12,7 @@ import {
   User,
   Zap,
 } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
 
 import { sendMessageToAgent } from "../lib/api";
 
@@ -116,9 +117,19 @@ function AgentBubble({ message }) {
             </div>
           ) : message.chatMode === "youtube_recommendation" && message.youtubeMetadata ? (
             <div className="space-y-4">
-              <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200">
-                {message.text}
-              </p>
+              <div className="prose prose-invert max-w-none text-gray-100 text-sm leading-relaxed space-y-2">
+                <ReactMarkdown 
+                    components={{
+                        h3: ({node, ...props}) => <h3 className="text-blue-400 font-bold text-base mt-4 mb-2" {...props} />,
+                        strong: ({node, ...props}) => <strong className="text-purple-400 font-semibold" {...props} />,
+                        ul: ({node, ...props}) => <ul className="list-disc pl-5 space-y-1 my-2 text-gray-300" {...props} />,
+                        ol: ({node, ...props}) => <ol className="list-decimal pl-5 space-y-1 my-2 text-gray-300" {...props} />,
+                        li: ({node, ...props}) => <li className="marker:text-purple-500" {...props} />
+                    }}
+                >
+                    {message.text}
+                </ReactMarkdown>
+              </div>
               <div className="space-y-4 pt-2">
                 {message.youtubeMetadata.map((video, idx) => (
                   <div key={idx} className="rounded-2xl border border-[#22252a] bg-[#141519] p-3.5 shadow-lg space-y-2">
@@ -141,9 +152,19 @@ function AgentBubble({ message }) {
               </div>
             </div>
           ) : (
-            <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200">
-              {message.text}
-            </p>
+            <div className="prose prose-invert max-w-none text-gray-100 text-sm leading-relaxed space-y-2">
+                <ReactMarkdown 
+                    components={{
+                        h3: ({node, ...props}) => <h3 className="text-blue-400 font-bold text-base mt-4 mb-2" {...props} />,
+                        strong: ({node, ...props}) => <strong className="text-purple-400 font-semibold" {...props} />,
+                        ul: ({node, ...props}) => <ul className="list-disc pl-5 space-y-1 my-2 text-gray-300" {...props} />,
+                        ol: ({node, ...props}) => <ol className="list-decimal pl-5 space-y-1 my-2 text-gray-300" {...props} />,
+                        li: ({node, ...props}) => <li className="marker:text-purple-500" {...props} />
+                    }}
+                >
+                    {message.text}
+                </ReactMarkdown>
+            </div>
           )}
         </div>
         <p className="mt-1.5 font-mono text-[0.65rem] text-[#9ca3af]">
@@ -169,7 +190,7 @@ function TypingIndicator() {
   );
 }
 
-export default function ChatBotUI({ setHasNewRoadmapNotification }) {
+export default function ChatBotUI({ user, setHasNewRoadmapNotification }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [sessionId, setSessionId] = useState();
@@ -177,7 +198,10 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
   const [isFocused, setIsFocused] = useState(false);
   const [error, setError] = useState(null);
   const [chatMode, setChatMode] = useState("general_chat");
+  const [activePersona, setActivePersona] = useState("hackathon_partner");
   const [browserStatus, setBrowserStatus] = useState(null);
+  const [selectedRepo, setSelectedRepo] = useState("");
+  const [expressRepos, setExpressRepos] = useState([]);
 
   const scrollAnchorRef = useRef(null);
   const textareaRef = useRef(null);
@@ -189,6 +213,24 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading, scrollToBottom]);
+
+  useEffect(() => {
+    const fetchExpressRepos = async () => {
+      try {
+        const res = await fetch("http://localhost:5001/api/repos");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && Array.isArray(data.repositories)) {
+            setExpressRepos(data.repositories);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch repositories from Express:", err);
+      }
+    };
+    fetchExpressRepos();
+  }, []);
+
 
   const submitMessage = useCallback(
     async (text) => {
@@ -213,6 +255,8 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
           trimmed,
           sessionId,
           chatMode,
+          activePersona,
+          selectedRepo,
         );
 
         setSessionId(nextSessionId);
@@ -255,8 +299,9 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
         textareaRef.current?.focus();
       }
     },
-    [isLoading, sessionId, chatMode],
+    [isLoading, sessionId, chatMode, activePersona, selectedRepo],
   );
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -272,6 +317,8 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
 
   const charCount = input.length;
   const nearLimit = charCount > MAX_CHARS * 0.85;
+
+  console.log("ChatBotUI User profile context:", user);
 
   return (
     <div className="relative flex h-full min-h-[600px] flex-col bg-void">
@@ -347,7 +394,7 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
             </div>
 
             {}
-            <div className="mb-3 flex gap-2">
+            <div className="mb-3 flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => setChatMode("general_chat")}
@@ -370,9 +417,106 @@ export default function ChatBotUI({ setHasNewRoadmapNotification }) {
               >
                 🗺️ Build Roadmap
               </button>
+              <button
+                type="button"
+                onClick={() => setChatMode("persona")}
+                className={`rounded-lg border px-4.5 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                  chatMode === "persona"
+                    ? "border-[#6366f1]/30 bg-[#6366f1]/5 text-[#f3f4f6]"
+                    : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
+                }`}
+              >
+                🎭 Agent Persona
+              </button>
             </div>
 
+            {chatMode === "persona" && (
+              <div className="mb-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActivePersona("hackathon_partner")}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-300 cursor-pointer ${
+                    activePersona === "hackathon_partner"
+                      ? "border-[#6366f1] bg-[#6366f1]/5 shadow-[0_0_15px_rgba(99,102,241,0.2)] text-[#f3f4f6]"
+                      : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
+                  }`}
+                >
+                  🎭 Hackathon Partner
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActivePersona("brutally_honest")}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-300 cursor-pointer ${
+                    activePersona === "brutally_honest"
+                      ? "border-[#6366f1] bg-[#6366f1]/5 shadow-[0_0_15px_rgba(99,102,241,0.2)] text-[#f3f4f6]"
+                      : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
+                  }`}
+                >
+                  🔥 Honest Reviewer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActivePersona("cyberpunk_os")}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-300 cursor-pointer ${
+                    activePersona === "cyberpunk_os"
+                      ? "border-[#6366f1] bg-[#6366f1]/5 shadow-[0_0_15px_rgba(99,102,241,0.2)] text-[#f3f4f6]"
+                      : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
+                  }`}
+                >
+                  🌐 Cyberpunk OS
+                </button>
+              </div>
+            )}
+
             {}
+            {/* Repo Selection Dropdown */}
+            {chatMode === "persona" && activePersona === "hackathon_partner" && (
+              <div className="mb-3 flex items-center gap-2">
+                <label htmlFor="repo-select" className="text-xs font-mono text-[#9ca3af] flex items-center gap-1.5">
+                  🎯 Focus Context:
+                </label>
+                <div className="relative">
+                  <select
+                    id="repo-select"
+                    value={selectedRepo}
+                    onChange={(e) => setSelectedRepo(e.target.value)}
+                    className="appearance-none rounded-lg border border-[#22252a] bg-[#141519] px-3.5 py-1.5 pr-8 text-xs font-semibold text-[#f3f4f6] shadow-md transition-all duration-300 hover:border-[#6366f1]/50 focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] focus:shadow-[0_0_10px_rgba(99,102,241,0.2)] focus:outline-none cursor-pointer"
+                  >
+                    {(() => {
+                      const userRepos = expressRepos.length > 0
+                        ? expressRepos
+                        : Array.isArray(user?.github?.repositories)
+                        ? user.github.repositories
+                        : Array.isArray(user?.repositories)
+                        ? user.repositories
+                        : [];
+                      const activeRepos = userRepos
+                        .map(r => typeof r === "string" ? r : r?.name)
+                        .filter(Boolean);
+                      if (activeRepos.length === 0) {
+                        return <option disabled>No repositories found</option>;
+                      }
+                      return (
+                        <>
+                          <option value="">All Projects</option>
+                          {activeRepos.map((repoName) => (
+                            <option key={repoName} value={repoName}>
+                              {repoName}
+                            </option>
+                          ))}
+                        </>
+                      );
+                    })()}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-[#9ca3af]">
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div
               className={`rounded-2xl border bg-[#141519]/50 p-1 transition-all duration-300 ${isFocused
                 ? "border-[#6366f1] shadow-[0_4px_20px_rgba(0,0,0,0.4)]"

@@ -126,10 +126,10 @@ function App() {
       <main className="flex-1 h-full overflow-y-auto min-w-0">
         {view === "dashboard" && <Dashboard setView={setView} user={user} isGuest={isGuest} />}
         {view === "chat" && (
-          <ChatBotUI setHasNewRoadmapNotification={setHasNewRoadmapNotification} />
+          <ChatBotUI user={user} setHasNewRoadmapNotification={setHasNewRoadmapNotification} />
         )}
         {view === "roadmaps" && <Roadmaps />}
-        {view === "ats" && <AtsScanner />}
+        {view === "ats" && <AtsScanner user={user} />}
         {view === "profile" && (
           <ProfilePage user={user} setUser={setUser} onLogout={handleLogout} />
         )}

@@ -10,19 +10,39 @@ export default function ProfilePage({ user, setUser, onLogout }) {
 
   const handleLinkLeetcode = async (e) => {
     e.preventDefault();
-    if (!leetcodeUsername.trim()) return;
+    let rawInput = leetcodeUsername.trim();
+    if (!rawInput) return;
+
+    if (rawInput.includes("leetcode.com")) {
+      try {
+        const urlStr = rawInput.startsWith("http") ? rawInput : "https://" + rawInput;
+        const url = new URL(urlStr);
+        const pathSegments = url.pathname.split("/").filter(Boolean);
+        if (pathSegments.length > 0) {
+          if (pathSegments[0] === "u" && pathSegments.length > 1) {
+            rawInput = pathSegments[1];
+          } else {
+            rawInput = pathSegments[0];
+          }
+        }
+      } catch (err) {
+        console.error("Failed to parse LeetCode URL", err);
+      }
+    }
+
+    setLeetcodeUsername(rawInput);
     setIsLinkingLeetcode(true);
     setLeetcodeError("");
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8000/api/auth/link/leetcode", {
+      const res = await fetch("http://localhost:8000/api/auth/leetcode/link", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ username: leetcodeUsername.trim() }),
+        body: JSON.stringify({ username: rawInput }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -187,12 +207,23 @@ export default function ProfilePage({ user, setUser, onLogout }) {
                         </span>
                       </div>
                       
-                      <div className="flex gap-4 text-xs text-[#9ca3af]">
-                        <div>
-                          Problems Solved: <strong className="text-[#f3f4f6] text-sm">{user.leetcode.totalSolved}</strong>
+                      <div className="flex flex-col gap-2 mt-1">
+                        <div className="flex gap-4 text-xs text-[#9ca3af] flex-wrap">
+                          <div>
+                            Solved: <strong className="text-[#f3f4f6] text-sm">{user.leetcode.totalSolved}</strong>
+                          </div>
+                          <div>
+                            Easy: <strong className="text-green-400 font-mono">{user.leetcode.easySolved || 0}</strong>
+                          </div>
+                          <div>
+                            Medium: <strong className="text-yellow-400 font-mono">{user.leetcode.mediumSolved || 0}</strong>
+                          </div>
+                          <div>
+                            Hard: <strong className="text-red-400 font-mono">{user.leetcode.hardSolved || 0}</strong>
+                          </div>
                         </div>
                         {user.leetcode.badges && user.leetcode.badges.length > 0 && (
-                          <div>
+                          <div className="text-xs text-[#9ca3af]">
                             Badges: <strong className="text-[#f3f4f6]">{user.leetcode.badges.join(", ")}</strong>
                           </div>
                         )}

@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -41,6 +41,9 @@ class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, description="User message for the agent")
     session_id: Optional[str] = Field(default=None, description="Existing chat session ID")
     chatMode: str = Field(default="general_chat", description="Chat mode")
+    activePersona: Optional[str] = Field(default=None, description="Active agent persona")
+    selectedRepo: Optional[str] = Field(default="", description="Selected repository for context")
+
 
 
 class ChatResponse(BaseModel):
@@ -87,8 +90,7 @@ def health() -> dict[str, str]:
 
 
 @api.post("/api/chat", response_model=ChatResponse)
-def chat(request: ChatRequest) -> ChatResponse:
-    """Invoke the LangGraph agent or route to standard conversational LLM based on chatMode."""
+def chat(request: ChatRequest, authorization: Optional[str] = Header(None)) -> ChatResponse:
     message = request.message.strip()
     if not message:
         raise HTTPException(status_code=400, detail="Message cannot be empty")
@@ -101,7 +103,10 @@ def chat(request: ChatRequest) -> ChatResponse:
         from mcp.tool_selector import select_tool
         selected_tool = select_tool(message)
 
-        if selected_tool == "youtube_search":
+        import re
+        is_youtube_requested = bool(re.search(r'youtube|video|watch|tutorial', message, re.IGNORECASE))
+
+        if selected_tool == "youtube_search" and is_youtube_requested:
             from mcp.mcp_executor import execute_tool
             tool_res = execute_tool(message)
             result = {"result": tool_res, "plan": None, "status": "success"}
@@ -115,14 +120,144 @@ def chat(request: ChatRequest) -> ChatResponse:
             except:
                 prob_name = "LeetCode Coding Problem"
             result = {"result": tool_res, "plan": None, "status": "launching_browser", "problem_name": prob_name}
-        elif request.chatMode == "general_chat":
+        elif request.chatMode == "general_chat" or request.chatMode == "persona" or (selected_tool == "youtube_search" and not is_youtube_requested):
+            from routes.auth import verify_jwt
+            from memory.user_db import get_user
+            current_user = None
+            if authorization and authorization.startswith("Bearer "):
+                token = authorization.split(" ")[1]
+                payload = verify_jwt(token)
+                if payload and "email" in payload:
+                    current_user = get_user(payload["email"])
+
+            username = "Gauthami"
+            easy = 439
+            medium = 139
+            hard = 4
+            repos = 3
+
+            topics_summary = ""
+            if current_user:
+                email_name = current_user.get("email", "Gauthami").split("@")[0].capitalize()
+                username = current_user.get("displayName") or email_name
+                leetcode = current_user.get("leetcode", {}) or {}
+                if leetcode.get("username"):
+                    easy = leetcode.get("easySolved", 0)
+                    medium = leetcode.get("mediumSolved", 0)
+                    hard = leetcode.get("hardSolved", 0)
+                github = current_user.get("github", {}) or {}
+                if github.get("username"):
+                    repos = github.get("repositories_count", 3)
+                
+                t_data = current_user.get("leetcode_topics")
+                if t_data:
+                    parts = []
+                    for level in ["advanced", "intermediate", "fundamental"]:
+                        level_topics = t_data.get(level, [])
+                        if level_topics:
+                            topics_list = [f"{t.get('tagName')} ({t.get('problemsSolved')} solved)" for t in level_topics if t.get("tagName")]
+                            if topics_list:
+                                parts.append(f"{level.capitalize()} tags: " + ", ".join(topics_list))
+                    if parts:
+                        topics_summary = "User LeetCode Topic breakdown details: " + "; ".join(parts) + "."
+            
+            if not topics_summary:
+                topics_summary = "User LeetCode Topic breakdown details: Advanced tags: Dynamic Programming (15 solved); Intermediate tags: Depth-First Search (25 solved); Fundamental tags: Arrays (45 solved)."
+
+            github_repos_list = []
+            if current_user:
+                github_data = current_user.get("github") or {}
+                raw_repos = github_data.get("repositories") or current_user.get("repositories") or []
+                if isinstance(raw_repos, list):
+                    for r in raw_repos:
+                        if isinstance(r, dict) and r.get("name"):
+                            github_repos_list.append(r.get("name"))
+                        elif isinstance(r, str):
+                            github_repos_list.append(r)
+
+            if not github_repos_list:
+                github_repos_list = ["OceanGuard", "LingoLeap", "SiteGuard", "Agentix", "agentix-backend", "agentix-frontend"]
+
+            github_repo_data_str = (
+                "--- GITHUB_REPOSITORY_DATA ---\n"
+                f"Repositories: {', '.join(github_repos_list)}\n"
+                "------------------------------"
+            )
+
+            leetcode_algo_data_str = (
+                "--- LEETCODE_ALGORITHM_DATA ---\n"
+                f"Easy Solved: {easy}\n"
+                f"Medium Solved: {medium}\n"
+                f"Hard Solved: {hard}\n"
+                f"Topic Breakdown: {topics_summary}\n"
+                "-------------------------------"
+            )
+
+            selected_repo_info = ""
+            if request.selectedRepo:
+                repo_desc = "No description available."
+                if current_user:
+                    github_data = current_user.get("github") or {}
+                    raw_repos = github_data.get("repositories") or current_user.get("repositories") or []
+                    if isinstance(raw_repos, list):
+                        for r in raw_repos:
+                            if isinstance(r, dict) and r.get("name") == request.selectedRepo:
+                                repo_desc = r.get("description") or repo_desc
+                                break
+                if repo_desc == "No description available.":
+                    mock_portfolios = {
+                        "OceanGuard": "Maritime incident reporting and verification system",
+                        "LingoLeap": "Language learning application architecture",
+                        "SiteGuard": "AI Safety monitoring and dashboard system",
+                        "Agentix": "LangGraph and MCP agent backend",
+                        "agentix-backend": "FastAPI backend",
+                        "agentix-frontend": "React Dashboard"
+                    }
+                    if request.selectedRepo in mock_portfolios:
+                        repo_desc = mock_portfolios[request.selectedRepo]
+                
+                selected_repo_info = f"\nACTIVE FOCUS REPOSITORY CONTEXT:\nName: {request.selectedRepo}\nDescription: {repo_desc}\nFocus all answers and advice around this project.\n"
+
             from langchain_groq import ChatGroq
             import os
             llm = ChatGroq(
                 model="llama-3.1-8b-instant",
                 api_key=os.getenv("GROQ_API_KEY")
             )
-            response = llm.invoke(message)
+            base_prompt = "CRITICAL FORMATTING RULE: When the user asks for a study plan, guide, or roadmap in general conversation, do NOT return raw JSON objects or escaped string codeblocks. Instead, respond with a beautifully structured, highly readable textual roadmap using markdown syntax. Use bold headings, bullet points, and numbered lists (e.g., '### Phase 1: Foundations\n* **Topic 1:** Description...'). Only output structured JSON when specifically communicating with an internal automated tool call that explicitly requests it."
+            system_prompt = base_prompt
+            if request.chatMode == "persona":
+                persona = request.activePersona or "hackathon_partner"
+                if persona == "hackathon_partner":
+                    system_prompt = (
+                        f"{base_prompt}\n\nYou are a hackathon partner. Maintain a strict structural separation between Gauthami's actual full-stack GitHub repositories (projects they built) and their LeetCode problem metrics. When asked about repositories, only reference their actual project names. Do not mistake LeetCode topic counts (like Arrays, DFS, Stack) for repository metrics or suggest putting problem counts 'inside' a repository.\n\n"
+                        f"{github_repo_data_str}\n\n"
+                        f"{leetcode_algo_data_str}"
+                    )
+                elif persona == "brutally_honest":
+                    system_prompt = (
+                        f"{base_prompt}\n\nYou are an Honest Reviewer. Brutally honest, critical of bad design or slow code, giving strict constructive feedback. Do not sugarcoat anything. "
+                        f"You see {username}'s stats: {easy} Easy, {medium} Medium, and a weak {hard} Hard problems solved. Call out this massive Easy-to-Hard imbalance directly, mock the single-digit Hard count, and tell them to stop dodging real algorithmic optimization.\n\n"
+                        f"{github_repo_data_str}\n\n"
+                        f"{leetcode_algo_data_str}"
+                    )
+                elif persona == "cyberpunk_os":
+                    system_prompt = (
+                        f"{base_prompt}\n\nYou are Cyberpunk OS. Talk in a sci-fi, terminal-based hacker vibe, using words like 'mainframe', 'handshake', 'port linked', etc. Keep the responses thematic. "
+                        f"Incorporate these telemetry diagnostics into your system status output: Core Node '{username}' connected. Data Structures Mastered: {easy} Level-1 sectors, {medium} Level-2 sectors, {hard} Level-3 critical sectors.\n\n"
+                        f"{github_repo_data_str}\n\n"
+                        f"{leetcode_algo_data_str}"
+                    )
+            
+            if selected_repo_info:
+                system_prompt = selected_repo_info + "\n" + system_prompt
+
+            
+            prompt_message = message
+            if system_prompt:
+                prompt_message = f"{system_prompt}\n\nUser Message: {message}"
+                
+            response = llm.invoke(prompt_message)
             response_text = response.content.strip()
             result = {"result": response_text, "plan": None, "status": "success"}
         else:
@@ -134,6 +269,12 @@ def chat(request: ChatRequest) -> ChatResponse:
         raise HTTPException(status_code=500, detail=f"Backend Agent Error: {str(e)}")
 
     response_text = result.get("result") or result.get("plan") or "No response generated."
+
+    if isinstance(response_text, (dict, list)):
+        import json
+        response_text = json.dumps(response_text)
+    elif not isinstance(response_text, str):
+        response_text = str(response_text)
 
     import json
     youtube_metadata = None

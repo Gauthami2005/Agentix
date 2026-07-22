@@ -53,16 +53,21 @@ export function completeRoadmapTopic(roadmapId, phaseTitle, topicName, completed
 }
 
 
-export function sendChat(message, sessionId, chatMode = "general_chat") {
+export function sendChat(message, sessionId, chatMode = "general_chat", activePersona = null, selectedRepo = "") {
+  const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
   return request("/api/chat", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message, session_id: sessionId ?? null, chatMode }),
+    headers,
+    body: JSON.stringify({ message, session_id: sessionId ?? null, chatMode, activePersona, selectedRepo }),
   });
 }
 
-export async function sendMessageToAgent(text, sessionId, chatMode) {
-  const data = await sendChat(text.trim(), sessionId, chatMode);
+export async function sendMessageToAgent(text, sessionId, chatMode, activePersona = null, selectedRepo = "") {
+  const data = await sendChat(text.trim(), sessionId, chatMode, activePersona, selectedRepo);
   return {
     reply: data.response,
     sessionId: data.session_id,
@@ -72,6 +77,7 @@ export async function sendMessageToAgent(text, sessionId, chatMode) {
     problemName: data.problem_name,
   };
 }
+
 
 export const DEFAULT_TASKS = [
   "Theory review — Arrays & Hashing",
