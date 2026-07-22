@@ -1,20 +1,99 @@
-from typing import Any, Optional
 import os
 from dotenv import load_dotenv
-load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
+
+from typing import Any, Optional
 
 from fastapi import FastAPI, HTTPException, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from agent import app as agent_graph
-from memory.memory_manager import add_message, create_session
+from mcp.db import get_db
+from datetime import datetime
+import uuid
+
+def create_session(task):
+    db = get_db()
+    session_id = str(uuid.uuid4())
+    db["agent_memories"].insert_one({
+        "sessionId": session_id,
+        "chatContext": [],
+        "title": task,
+        "lastUpdated": datetime.utcnow()
+    })
+    return session_id
+
+def add_message(session_id, role, content):
+    db = get_db()
+    db["agent_memories"].update_one(
+        {"sessionId": session_id},
+        {
+            "$push": {"chatContext": {"role": role, "content": content}},
+            "$set": {"lastUpdated": datetime.utcnow()}
+        }
+    )
+
+def load_schedule():
+    db = get_db()
+    doc = db["schedules"].find_one(sort=[("createdAt", -1)])
+    if not doc:
+        doc = db["schedules"].find_one()
+    if doc:
+        return {
+            "today": doc.get("today", []),
+            "tomorrow": doc.get("tomorrow", [])
+        }
+    return {"today": [], "tomorrow": []}
+
+def save_schedule(data):
+    db = get_db()
+    db["schedules"].delete_many({})
+    db["schedules"].insert_one({
+        "taskQueue": data.get("today", []),
+        "today": data.get("today", []),
+        "tomorrow": data.get("tomorrow", []),
+        "reminders": [],
+        "createdAt": datetime.utcnow()
+    })
+
+def toggle_task(task_name, completed):
+    data = load_schedule()
+    target = task_name.strip()
+    updated = False
+    
+    import re
+    def clean_t(name):
+        return re.sub(r'^[-*+•\s]+', '', name).strip()
+        
+    clean_target = clean_t(target)
+    
+    for item in data.setdefault("today", []):
+        if clean_t(item.get("task", "")) == clean_target:
+            item["completed"] = completed
+            updated = True
+            
+    if not updated:
+        data["today"].append({"task": target, "completed": completed})
+        
+    save_schedule(data)
+
+def clear_schedule():
+    db = get_db()
+    db["schedules"].delete_many({})
+    db["progresses"].delete_many({})
+    try:
+        from mcp.progress_mcp import reset_progress
+        reset_progress()
+    except Exception as e:
+        print(f"Error resetting progress on clear schedule: {e}")
+
 from mcp.daily_task_mcp import today_tasks
 from mcp.roadmap_manager import load_roadmaps, clear_roadmaps
-from memory.schedule_manager import clear_schedule
 
 from routes.auth import router as auth_router
 from routes.resume import router as resume_router
+from routes.notes import router as notes_router
 
 api = FastAPI(
     title="Agentix API",
@@ -24,6 +103,32 @@ api = FastAPI(
 
 api.include_router(auth_router)
 api.include_router(resume_router)
+api.include_router(notes_router)
+
+@api.on_event("startup")
+def startup_event():
+    try:
+        db = get_db()
+        # Ping MongoDB Atlas
+        db.client.admin.command("ping")
+        
+        db_name = db.name
+        print(f"\n⚡ Successfully connected to MongoDB Atlas! Database: {db_name}")
+        
+        # Verify collection setup
+        required_cols = ['notes', 'users', 'roadmaps', 'progresses', 'progress', 'schedules', 'agent_memories', 'agentmemories']
+        existing_cols = db.list_collection_names()
+        
+        for col in required_cols:
+            if col in existing_cols:
+                print(f"✅ Collection '{col}' is present.")
+            else:
+                # If collection doesn't exist yet, we print that it will be created dynamically
+                print(f"ℹ️  Collection '{col}' does not exist yet. It will be created dynamically on first write.")
+        print("")
+    except Exception as e:
+        print(f"\n⚠️  MongoDB verification warning/error: {e}")
+        print("Please check your MONGO_URI value in backend/.env to ensure a healthy connection.\n")
 
 api.add_middleware(
     CORSMiddleware,
@@ -121,8 +226,7 @@ def chat(request: ChatRequest, authorization: Optional[str] = Header(None)) -> C
                 prob_name = "LeetCode Coding Problem"
             result = {"result": tool_res, "plan": None, "status": "launching_browser", "problem_name": prob_name}
         elif request.chatMode == "general_chat" or request.chatMode == "persona" or (selected_tool == "youtube_search" and not is_youtube_requested):
-            from routes.auth import verify_jwt
-            from memory.user_db import get_user
+            from routes.auth import verify_jwt, get_user
             current_user = None
             if authorization and authorization.startswith("Bearer "):
                 token = authorization.split(" ")[1]
@@ -323,7 +427,7 @@ def delete_roadmap():
 @api.get("/api/tasks", response_model=TasksResponse)
 def get_tasks() -> TasksResponse:
     """Fetch today's study tasks and sync from roadmap if empty."""
-    from memory.schedule_manager import load_schedule, save_schedule
+    # Using global load_schedule and save_schedule
     sched = load_schedule()
 
     if not sched.get("today") or len(sched["today"]) == 0:
@@ -346,9 +450,7 @@ def get_tasks() -> TasksResponse:
 def toggle_task_endpoint(req: ToggleTaskRequest) -> dict[str, Any]:
     """Toggle task completion state on backend and return recalculated progress."""
     try:
-        from memory.schedule_manager import toggle_task
-        from mcp.progress_mcp import update_progress
-        from memory.progress_manager import calculate_progress
+        from mcp.progress_mcp import update_progress, calculate_progress
 
         toggle_task(req.task, req.completed)
 
@@ -367,10 +469,8 @@ def toggle_task_endpoint(req: ToggleTaskRequest) -> dict[str, Any]:
 def complete_task_endpoint(req: CompleteTaskRequest) -> dict[str, Any]:
     """Complete a task and automatically trigger schedule optimization via Adaptive Planner MCP."""
     try:
-        from memory.schedule_manager import toggle_task
-        from mcp.progress_mcp import update_progress
+        from mcp.progress_mcp import update_progress, calculate_progress
         from mcp.adaptive_planner_mcp import adapt_schedule
-        from memory.progress_manager import calculate_progress
 
         toggle_task(req.task_name, req.completed)
         update_progress(req.task_name, req.completed)
@@ -411,7 +511,7 @@ def complete_roadmap_topic_endpoint(req: CompleteRoadmapTopicRequest) -> dict[st
 def get_progress_endpoint() -> dict[str, Any]:
     """Fetch recalculated progress details."""
     try:
-        from memory.progress_manager import calculate_progress
+        from mcp.progress_mcp import calculate_progress
         return calculate_progress()
     except Exception as exc:
         raise HTTPException(status_code=550, detail=f"Failed to fetch progress: {exc}")

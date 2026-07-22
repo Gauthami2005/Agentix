@@ -14,7 +14,45 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query, Header
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
-from memory.user_db import create_or_update_google_user, get_user, save_user
+from mcp.db import get_db
+
+def get_user(email: str) -> dict:
+    db = get_db()
+    user = db["users"].find_one({"email": email.lower()})
+    if user and "_id" in user:
+        user["_id"] = str(user["_id"])
+    return user
+
+def save_user(user: dict):
+    db = get_db()
+    user_copy = user.copy()
+    if "_id" in user_copy:
+        del user_copy["_id"]
+    email = user["email"].lower()
+    db["users"].update_one({"email": email}, {"$set": user_copy}, upsert=True)
+    print(f"⚡ User profile for {email} successfully saved to MongoDB.")
+
+def create_or_update_google_user(email: str, display_name: str, google_id: str = None, picture: str = None) -> dict:
+    email_lc = email.lower()
+    user = get_user(email_lc)
+    if not user:
+        user = {
+            "email": email_lc,
+            "displayName": display_name,
+            "googleId": google_id,
+            "picture": picture,
+            "github": None,
+            "leetcode": None,
+            "createdAt": datetime.utcnow().isoformat()
+        }
+    else:
+        user["displayName"] = display_name
+        if google_id:
+            user["googleId"] = google_id
+        if picture:
+            user["picture"] = picture
+    save_user(user)
+    return user
 
 router = APIRouter(prefix="/api/auth", tags=["authentication"])
 
@@ -194,62 +232,69 @@ def google_auth():
 
 @router.get("/google/callback")
 async def google_callback(code: str = Query(...)):
-    client_id = os.getenv("GOOGLE_CLIENT_ID")
-    client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
-    redirect_uri = os.getenv("GOOGLE_CALLBACK_URL", "http://localhost:8000/api/auth/google/callback")
-    
-    email = None
-    display_name = None
-    google_id = None
-    picture = None
-    
-    if code == "mock_dev_oauth_code" or not client_id or not client_secret:
-        email = "developer@agentix.ai"
-        display_name = "Dev Gauthami"
-        google_id = "mock-google-id-12345"
-        picture = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
-    else:
-        try:
-            token_url = "https://oauth2.googleapis.com/token"
-            data = {
-                "client_id": client_id,
-                "client_secret": client_secret,
-                "code": code,
-                "grant_type": "authorization_code",
-                "redirect_uri": redirect_uri
-            }
-            res = await httpx_client.post(token_url, data=data, timeout=5.0)
-            if res.status_code == 200:
-                token_data = res.json()
-                access_token = token_data.get("access_token")
-                
-                if access_token:
-                    user_res = await httpx_client.get(
-                        "https://www.googleapis.com/oauth2/v3/userinfo",
-                        headers={"Authorization": f"Bearer {access_token}"},
-                        timeout=5.0
-                    )
-                    if user_res.status_code == 200:
-                        user_info = user_res.json()
-                        email = user_info.get("email")
-                        display_name = user_info.get("name") or user_info.get("given_name")
-                        google_id = user_info.get("sub")
-                        picture = user_info.get("picture")
-        except Exception as e:
-            print(f"Google OAuth Callback error: {e}")
-            
-    if not email:
-        email = "developer@agentix.ai"
-        display_name = "Dev Gauthami"
-        google_id = "mock-google-id-12345"
-        picture = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+    import traceback
+    try:
+        client_id = os.getenv("GOOGLE_CLIENT_ID")
+        client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
+        redirect_uri = os.getenv("GOOGLE_CALLBACK_URL", "http://localhost:8000/api/auth/google/callback")
         
-    user = await anyio.to_thread.run_sync(
-        create_or_update_google_user, email, display_name, google_id, picture
-    )
-    token = generate_jwt({"email": user["email"], "displayName": user["displayName"]})
-    
-    return RedirectResponse(url=f"http://localhost:5173/?token={token}")
+        email = None
+        display_name = None
+        google_id = None
+        picture = None
+        
+        if code == "mock_dev_oauth_code" or not client_id or not client_secret:
+            email = "developer@agentix.ai"
+            display_name = "Dev Gauthami"
+            google_id = "mock-google-id-12345"
+            picture = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+        else:
+            try:
+                token_url = "https://oauth2.googleapis.com/token"
+                data = {
+                    "client_id": client_id,
+                    "client_secret": client_secret,
+                    "code": code,
+                    "grant_type": "authorization_code",
+                    "redirect_uri": redirect_uri
+                }
+                res = await httpx_client.post(token_url, data=data, timeout=5.0)
+                if res.status_code == 200:
+                    token_data = res.json()
+                    access_token = token_data.get("access_token")
+                    
+                    if access_token:
+                        user_res = await httpx_client.get(
+                            "https://www.googleapis.com/oauth2/v3/userinfo",
+                            headers={"Authorization": f"Bearer {access_token}"},
+                            timeout=5.0
+                        )
+                        if user_res.status_code == 200:
+                            user_info = user_res.json()
+                            email = user_info.get("email")
+                            display_name = user_info.get("name") or user_info.get("given_name")
+                            google_id = user_info.get("sub")
+                            picture = user_info.get("picture")
+            except Exception as e:
+                print(f"Google OAuth Callback token/userinfo request error: {e}")
+                
+        if not email:
+            email = "developer@agentix.ai"
+            display_name = "Dev Gauthami"
+            google_id = "mock-google-id-12345"
+            picture = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+            
+        user = await anyio.to_thread.run_sync(
+            create_or_update_google_user, email, display_name, google_id, picture
+        )
+        print(f"⚡ Google OAuth callback successful for user: {user.get('email')}")
+        token = generate_jwt({"email": user["email"], "displayName": user["displayName"]})
+        
+        return RedirectResponse(url=f"http://localhost:5173/dashboard?token={token}")
+    except Exception as e:
+        print("❌ Error encountered in google_callback:")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Google OAuth Callback failed: {str(e)}")
 
 @router.post("/link/github")
 def link_github(req: LinkGithubRequest, current_user: dict = Depends(get_current_user)):

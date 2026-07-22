@@ -1,10 +1,55 @@
+import os
+from dotenv import load_dotenv
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
+
 import json
 from datetime import datetime
 from pathlib import Path
 
 import streamlit as st
 
-from memory.memory_manager import add_message, create_session, get_sessions
+import uuid
+from mcp.db import get_db
+
+def get_sessions():
+    try:
+        db = get_db()
+        docs = list(db["agent_memories"].find().sort("lastUpdated", -1))
+        for doc in docs:
+            doc["id"] = doc.get("sessionId")
+            doc["messages"] = doc.get("chatContext", [])
+        return docs
+    except Exception as e:
+        print(f"Error loading sessions: {e}")
+        return []
+
+def create_session(task):
+    try:
+        db = get_db()
+        session_id = str(uuid.uuid4())
+        db["agent_memories"].insert_one({
+            "sessionId": session_id,
+            "chatContext": [],
+            "title": task,
+            "lastUpdated": datetime.utcnow()
+        })
+        return session_id
+    except Exception as e:
+        print(f"Error creating session: {e}")
+        return str(uuid.uuid4())
+
+def add_message(session_id, role, content):
+    try:
+        db = get_db()
+        db["agent_memories"].update_one(
+            {"sessionId": session_id},
+            {
+                "$push": {"chatContext": {"role": role, "content": content}},
+                "$set": {"lastUpdated": datetime.utcnow()}
+            }
+        )
+    except Exception as e:
+        print(f"Error adding message: {e}")
 from mcp.daily_task_mcp import today_tasks
 from mcp.leetcode_mcp import search_problems
 from mcp.progress_mcp import progress_db, update_progress, weak_topics

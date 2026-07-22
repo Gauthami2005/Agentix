@@ -4,7 +4,7 @@ import { Plus, Search, Trash2, Tag, BookOpen, Code, Edit3, X, Eye, FileText, Che
 // Code highlighter function
 function highlightCode(code, lang) {
   if (!code) return "";
-  
+
   let escaped = code
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -12,10 +12,10 @@ function highlightCode(code, lang) {
 
   // Strings
   escaped = escaped.replace(/(["'`])(.*?)\1/g, '<span class="text-emerald-400">$1$2$1</span>');
-  
+
   // Comments
   escaped = escaped.replace(/(\/\/.*|\/\*[\s\S]*?\*\/|#.*)/g, '<span class="text-gray-500 italic">$1</span>');
-  
+
   // Keywords
   const keywords = /\b(const|let|var|function|return|if|else|for|while|do|switch|case|break|continue|import|export|class|new|this|typeof|instanceof|await|async|default|from|try|catch|finally|throw|def|print)\b/g;
   escaped = escaped.replace(keywords, '<span class="text-[#ff79c6] font-semibold">$1</span>');
@@ -158,11 +158,11 @@ export default function Notes() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("All");
-  
+
   // Editor/Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingNote, setEditingNote] = useState(null);
-  
+
   // Form fields
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("DSA");
@@ -313,12 +313,12 @@ export default function Notes() {
 
   // Filter notes
   const filteredNotes = notes.filter(note => {
-    const matchesSearch = 
+    const matchesSearch =
       note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       note.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
       note.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    const matchesCategory = 
+    const matchesCategory =
       selectedCategoryFilter === "All" || note.category === selectedCategoryFilter;
 
     return matchesSearch && matchesCategory;
@@ -338,7 +338,7 @@ export default function Notes() {
             Notes & Code Snippets
           </h1>
           <p className="text-sm text-[#9ca3af] mt-1 font-mono">
-            Manage your local developer knowledge base.
+            Your second brain for syntax, snippets, and system architecture.
           </p>
         </div>
 
@@ -369,11 +369,10 @@ export default function Notes() {
             <button
               key={cat}
               onClick={() => setSelectedCategoryFilter(cat)}
-              className={`px-4 py-2.5 rounded-xl text-xs font-mono tracking-wide border transition cursor-pointer ${
-                selectedCategoryFilter === cat
+              className={`px-4 py-2.5 rounded-xl text-xs font-mono tracking-wide border transition cursor-pointer ${selectedCategoryFilter === cat
                   ? "bg-[#6366f1]/20 border-[#6366f1] text-[#f3f4f6]"
                   : "bg-[#121316] border-[#22252a] text-[#9ca3af] hover:text-[#f3f4f6]"
-              }`}
+                }`}
             >
               {cat}
             </button>
@@ -562,7 +561,7 @@ export default function Notes() {
                         UTF-8
                       </span>
                     </div>
-                    
+
                     <textarea
                       required
                       value={content}

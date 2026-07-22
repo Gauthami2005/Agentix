@@ -431,8 +431,7 @@ export default function Dashboard({ setView, user, isGuest }) {
                 )}
               </h1>
               <p className="text-sm text-[#9ca3af]">
-                LangGraph + MCP agent ready · {formatDate()}
-              </p>
+                Your personal AI assistant for placement prep.              </p>
               {roadmaps.length > 0 && (
                 <div className="relative mt-3 inline-block w-full max-w-xs">
                   <select
@@ -591,15 +590,15 @@ export default function Dashboard({ setView, user, isGuest }) {
                                   toggleRoadmapTopic(phase.phase_title, topic);
                                 }}
                                 className={`flex items-center gap-2.5 rounded-lg border px-3 py-1.5 text-left transition cursor-pointer text-xs ${isTopicCompleted
-                                    ? "border-[#6366f1]/20 bg-[#6366f1]/5 text-[#f3f4f6]"
-                                    : "border-[#22252a] bg-[#141519]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:bg-[#1c1e22]"
+                                  ? "border-[#6366f1]/20 bg-[#6366f1]/5 text-[#f3f4f6]"
+                                  : "border-[#22252a] bg-[#141519]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:bg-[#1c1e22]"
                                   }`}
                               >
                                 <button
                                   type="button"
                                   className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border bg-transparent transition-all duration-300 cursor-pointer ${isTopicCompleted
-                                      ? "border-[#6366f1]/40 text-[#6366f1]"
-                                      : "border-slate-600 text-slate-500 hover:border-[#6366f1]"
+                                    ? "border-[#6366f1]/40 text-[#6366f1]"
+                                    : "border-slate-600 text-slate-500 hover:border-[#6366f1]"
                                     }`}
                                 >
                                   {isTopicCompleted ? (

@@ -1,116 +1,106 @@
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
+const Note = require('../models/Note');
 
-let NOTES_FILE_PATH = path.join(__dirname, '../../backend/memory/notes.json');
-try {
-  if (fs.existsSync(path.join(__dirname, '../memory/notes.json'))) {
-    NOTES_FILE_PATH = path.join(__dirname, '../memory/notes.json');
-  }
-} catch (e) {}
-
-const readNotesFromFile = () => {
+// Get all notes
+exports.getNotes = async (req, res) => {
   try {
-    if (!fs.existsSync(NOTES_FILE_PATH)) {
-      // Ensure directory exists
-      const dir = path.dirname(NOTES_FILE_PATH);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-      fs.writeFileSync(NOTES_FILE_PATH, '[]');
-      return [];
-    }
-    const data = fs.readFileSync(NOTES_FILE_PATH, 'utf8');
-    return JSON.parse(data || '[]');
+    const notes = await Note.find().sort({ createdAt: -1 });
+    res.status(200).json(notes);
   } catch (error) {
-    console.error('Error reading notes file:', error);
-    return [];
+    res.status(500).json({ status: 'error', message: error.message });
   }
 };
 
-const writeNotesToFile = (notes) => {
-  try {
-    const dir = path.dirname(NOTES_FILE_PATH);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(NOTES_FILE_PATH, JSON.stringify(notes, null, 2));
-    return true;
-  } catch (error) {
-    console.error('Error writing notes file:', error);
-    return false;
-  }
-};
-
-exports.getNotes = (req, res) => {
-  const notes = readNotesFromFile();
-  res.status(200).json(notes);
-};
-
-exports.saveNotes = (req, res) => {
+// Save a single note or an array of notes
+exports.saveNotes = async (req, res) => {
   const payload = req.body;
-  
+
   if (Array.isArray(payload)) {
-    const success = writeNotesToFile(payload);
-    if (success) {
-      return res.status(200).json({ status: 'success', message: 'Notes array updated successfully' });
+    try {
+      // Clear existing and replace with new array
+      await Note.deleteMany({});
+      const inserted = await Note.insertMany(payload);
+      return res.status(200).json({ status: 'success', message: 'Notes array updated successfully', notes: inserted });
+    } catch (error) {
+      return res.status(500).json({ status: 'error', message: error.message });
     }
-    return res.status(500).json({ status: 'error', message: 'Failed to write notes array' });
   }
 
   // Handle single note saving/updating
-  if (!payload || !payload.title) {
-    return res.status(400).json({ status: 'error', message: 'Note title is required' });
+  if (!payload) {
+    return res.status(400).json({ status: 'error', message: 'Payload is required' });
   }
 
-  const notes = readNotesFromFile();
-  const noteId = payload.id;
+  const noteId = payload.id || payload._id;
 
-  if (noteId) {
-    // Update existing note
-    const index = notes.findIndex(n => n.id === noteId);
-    if (index !== -1) {
-      notes[index] = {
-        ...notes[index],
-        ...payload,
-        createdAt: payload.createdAt || new Date().toISOString()
-      };
-    } else {
-      notes.push({
-        ...payload,
-        createdAt: payload.createdAt || new Date().toISOString()
-      });
-    }
-  } else {
-    // Create new note
-    const newNote = {
+  try {
+    let note;
+    const noteData = {
       ...payload,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
+      title: payload.title || 'Untitled Note'
     };
-    notes.unshift(newNote);
-  }
 
-  const success = writeNotesToFile(notes);
-  if (success) {
-    res.status(200).json({ status: 'success', message: 'Note saved successfully', notes });
-  } else {
-    res.status(500).json({ status: 'error', message: 'Failed to save note' });
+    if (noteId) {
+      if (mongoose.Types.ObjectId.isValid(noteId)) {
+        note = await Note.findByIdAndUpdate(noteId, noteData, { new: true });
+      } else {
+        note = await Note.findOneAndUpdate({ id: noteId }, noteData, { new: true });
+      }
+      
+      if (note) {
+        console.log('📝 Saved note to MongoDB Atlas: ' + note._id);
+      } else {
+        // If not found by ID (maybe a new string ID), create it
+        const { title, content, tags, userId, user_id, createdAt } = payload;
+        const newNote = new Note({
+          title: title || 'Untitled Note',
+          content: content || '',
+          tags: tags || [],
+          userId: userId || user_id,
+          user_id: user_id || userId,
+          createdAt: createdAt || new Date()
+        });
+        note = await newNote.save();
+        console.log('📝 Saved note to MongoDB Atlas: ' + note._id);
+      }
+    } else {
+      // Create new note
+      const { title, content, tags, userId, user_id } = payload;
+      const newNote = new Note({
+        title: title || 'Untitled Note',
+        content: content || '',
+        tags: tags || [],
+        userId: userId || user_id,
+        user_id: user_id || userId,
+        createdAt: new Date()
+      });
+      note = await newNote.save();
+      console.log('📝 Saved note to MongoDB Atlas: ' + note._id);
+    }
+
+    const notes = await Note.find().sort({ createdAt: -1 });
+    res.status(200).json({ status: 'success', message: 'Note saved successfully', note, notes });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
   }
 };
 
-exports.deleteNote = (req, res) => {
+// Delete a note
+exports.deleteNote = async (req, res) => {
   const { id } = req.params;
   if (!id) {
     return res.status(400).json({ status: 'error', message: 'Note ID is required' });
   }
 
-  let notes = readNotesFromFile();
-  notes = notes.filter(n => n.id !== id);
-
-  const success = writeNotesToFile(notes);
-  if (success) {
+  try {
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      await Note.findByIdAndDelete(id);
+    } else {
+      await Note.deleteOne({ id });
+    }
+    const notes = await Note.find().sort({ createdAt: -1 });
     res.status(200).json(notes);
-  } else {
-    res.status(500).json({ status: 'error', message: 'Failed to delete note' });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
   }
 };

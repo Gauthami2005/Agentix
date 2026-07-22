@@ -40,7 +40,7 @@ function App() {
       setView("profile");
     }
     if (token || githubConnected === "true" || viewParam) {
-      window.history.replaceState({}, document.title, window.location.pathname);
+      window.history.replaceState({}, document.title, "/");
     }
     fetchUserProfile();
   }, []);

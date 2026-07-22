@@ -57,9 +57,7 @@ function WelcomeBanner() {
         Agentix AI Chat
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-[#9ca3af]">
-        LangGraph + MCP agent powered by Groq/Llama. Ask for roadmaps, LeetCode
-        problems, or today&apos;s study plan.
-      </p>
+        Inspect repos. Watch tutorials. Crush LeetCode. Ask anything      </p>
     </div>
   );
 }
@@ -118,16 +116,16 @@ function AgentBubble({ message }) {
           ) : message.chatMode === "youtube_recommendation" && message.youtubeMetadata ? (
             <div className="space-y-4">
               <div className="prose prose-invert max-w-none text-gray-100 text-sm leading-relaxed space-y-2">
-                <ReactMarkdown 
-                    components={{
-                        h3: ({node, ...props}) => <h3 className="text-blue-400 font-bold text-base mt-4 mb-2" {...props} />,
-                        strong: ({node, ...props}) => <strong className="text-purple-400 font-semibold" {...props} />,
-                        ul: ({node, ...props}) => <ul className="list-disc pl-5 space-y-1 my-2 text-gray-300" {...props} />,
-                        ol: ({node, ...props}) => <ol className="list-decimal pl-5 space-y-1 my-2 text-gray-300" {...props} />,
-                        li: ({node, ...props}) => <li className="marker:text-purple-500" {...props} />
-                    }}
+                <ReactMarkdown
+                  components={{
+                    h3: ({ node, ...props }) => <h3 className="text-blue-400 font-bold text-base mt-4 mb-2" {...props} />,
+                    strong: ({ node, ...props }) => <strong className="text-purple-400 font-semibold" {...props} />,
+                    ul: ({ node, ...props }) => <ul className="list-disc pl-5 space-y-1 my-2 text-gray-300" {...props} />,
+                    ol: ({ node, ...props }) => <ol className="list-decimal pl-5 space-y-1 my-2 text-gray-300" {...props} />,
+                    li: ({ node, ...props }) => <li className="marker:text-purple-500" {...props} />
+                  }}
                 >
-                    {message.text}
+                  {message.text}
                 </ReactMarkdown>
               </div>
               <div className="space-y-4 pt-2">
@@ -153,17 +151,17 @@ function AgentBubble({ message }) {
             </div>
           ) : (
             <div className="prose prose-invert max-w-none text-gray-100 text-sm leading-relaxed space-y-2">
-                <ReactMarkdown 
-                    components={{
-                        h3: ({node, ...props}) => <h3 className="text-blue-400 font-bold text-base mt-4 mb-2" {...props} />,
-                        strong: ({node, ...props}) => <strong className="text-purple-400 font-semibold" {...props} />,
-                        ul: ({node, ...props}) => <ul className="list-disc pl-5 space-y-1 my-2 text-gray-300" {...props} />,
-                        ol: ({node, ...props}) => <ol className="list-decimal pl-5 space-y-1 my-2 text-gray-300" {...props} />,
-                        li: ({node, ...props}) => <li className="marker:text-purple-500" {...props} />
-                    }}
-                >
-                    {message.text}
-                </ReactMarkdown>
+              <ReactMarkdown
+                components={{
+                  h3: ({ node, ...props }) => <h3 className="text-blue-400 font-bold text-base mt-4 mb-2" {...props} />,
+                  strong: ({ node, ...props }) => <strong className="text-purple-400 font-semibold" {...props} />,
+                  ul: ({ node, ...props }) => <ul className="list-disc pl-5 space-y-1 my-2 text-gray-300" {...props} />,
+                  ol: ({ node, ...props }) => <ol className="list-decimal pl-5 space-y-1 my-2 text-gray-300" {...props} />,
+                  li: ({ node, ...props }) => <li className="marker:text-purple-500" {...props} />
+                }}
+              >
+                {message.text}
+              </ReactMarkdown>
             </div>
           )}
         </div>
@@ -336,7 +334,7 @@ export default function ChatBotUI({ user, setHasNewRoadmapNotification }) {
       )}
 
       <div className="relative flex min-h-0 flex-1 flex-col">
-        {}
+        { }
         <header className="shrink-0 border-b border-[#22252a] bg-[#121316]/50 px-4 py-4 sm:px-6">
           <div className="mx-auto flex max-w-4xl items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#22252a] bg-[#1c1d22]">
@@ -356,7 +354,7 @@ export default function ChatBotUI({ user, setHasNewRoadmapNotification }) {
           </div>
         </header>
 
-        {}
+        { }
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6">
           <div className="mx-auto flex max-w-4xl flex-col gap-6">
             {messages.length === 0 && !isLoading && <WelcomeBanner />}
@@ -375,10 +373,10 @@ export default function ChatBotUI({ user, setHasNewRoadmapNotification }) {
           </div>
         </div>
 
-        {}
+        { }
         <footer className="shrink-0 border-t border-[#22252a] bg-[#121316]/50 px-4 py-4 sm:px-6">
           <form onSubmit={handleSubmit} className="mx-auto max-w-4xl">
-            {}
+            { }
             <div className="mb-3 flex flex-wrap gap-2">
               {QUICK_PROMPTS.map((prompt) => (
                 <button
@@ -393,38 +391,35 @@ export default function ChatBotUI({ user, setHasNewRoadmapNotification }) {
               ))}
             </div>
 
-            {}
+            { }
             <div className="mb-3 flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => setChatMode("general_chat")}
-                className={`rounded-lg border px-4.5 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
-                  chatMode === "general_chat"
-                    ? "border-[#6366f1]/30 bg-[#6366f1]/5 text-[#f3f4f6]"
-                    : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
-                }`}
+                className={`rounded-lg border px-4.5 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${chatMode === "general_chat"
+                  ? "border-[#6366f1]/30 bg-[#6366f1]/5 text-[#f3f4f6]"
+                  : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
+                  }`}
               >
                 💬 General Chat
               </button>
               <button
                 type="button"
                 onClick={() => setChatMode("generate_roadmap")}
-                className={`rounded-lg border px-4.5 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
-                  chatMode === "generate_roadmap"
-                    ? "border-[#6366f1]/30 bg-[#6366f1]/5 text-[#f3f4f6]"
-                    : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
-                }`}
+                className={`rounded-lg border px-4.5 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${chatMode === "generate_roadmap"
+                  ? "border-[#6366f1]/30 bg-[#6366f1]/5 text-[#f3f4f6]"
+                  : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
+                  }`}
               >
                 🗺️ Build Roadmap
               </button>
               <button
                 type="button"
                 onClick={() => setChatMode("persona")}
-                className={`rounded-lg border px-4.5 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
-                  chatMode === "persona"
-                    ? "border-[#6366f1]/30 bg-[#6366f1]/5 text-[#f3f4f6]"
-                    : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
-                }`}
+                className={`rounded-lg border px-4.5 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${chatMode === "persona"
+                  ? "border-[#6366f1]/30 bg-[#6366f1]/5 text-[#f3f4f6]"
+                  : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
+                  }`}
               >
                 🎭 Agent Persona
               </button>
@@ -435,40 +430,37 @@ export default function ChatBotUI({ user, setHasNewRoadmapNotification }) {
                 <button
                   type="button"
                   onClick={() => setActivePersona("hackathon_partner")}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-300 cursor-pointer ${
-                    activePersona === "hackathon_partner"
-                      ? "border-[#6366f1] bg-[#6366f1]/5 shadow-[0_0_15px_rgba(99,102,241,0.2)] text-[#f3f4f6]"
-                      : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
-                  }`}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-300 cursor-pointer ${activePersona === "hackathon_partner"
+                    ? "border-[#6366f1] bg-[#6366f1]/5 shadow-[0_0_15px_rgba(99,102,241,0.2)] text-[#f3f4f6]"
+                    : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
+                    }`}
                 >
                   🎭 Hackathon Partner
                 </button>
                 <button
                   type="button"
                   onClick={() => setActivePersona("brutally_honest")}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-300 cursor-pointer ${
-                    activePersona === "brutally_honest"
-                      ? "border-[#6366f1] bg-[#6366f1]/5 shadow-[0_0_15px_rgba(99,102,241,0.2)] text-[#f3f4f6]"
-                      : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
-                  }`}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-300 cursor-pointer ${activePersona === "brutally_honest"
+                    ? "border-[#6366f1] bg-[#6366f1]/5 shadow-[0_0_15px_rgba(99,102,241,0.2)] text-[#f3f4f6]"
+                    : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
+                    }`}
                 >
                   🔥 Honest Reviewer
                 </button>
                 <button
                   type="button"
                   onClick={() => setActivePersona("cyberpunk_os")}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-300 cursor-pointer ${
-                    activePersona === "cyberpunk_os"
-                      ? "border-[#6366f1] bg-[#6366f1]/5 shadow-[0_0_15px_rgba(99,102,241,0.2)] text-[#f3f4f6]"
-                      : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
-                  }`}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-300 cursor-pointer ${activePersona === "cyberpunk_os"
+                    ? "border-[#6366f1] bg-[#6366f1]/5 shadow-[0_0_15px_rgba(99,102,241,0.2)] text-[#f3f4f6]"
+                    : "border-[#22252a] bg-[#121316]/30 text-[#9ca3af] hover:border-[#6366f1]/30 hover:text-[#f3f4f6]"
+                    }`}
                 >
                   🌐 Cyberpunk OS
                 </button>
               </div>
             )}
 
-            {}
+            { }
             {/* Repo Selection Dropdown */}
             {chatMode === "persona" && activePersona === "hackathon_partner" && (
               <div className="mb-3 flex items-center gap-2">
@@ -486,10 +478,10 @@ export default function ChatBotUI({ user, setHasNewRoadmapNotification }) {
                       const userRepos = expressRepos.length > 0
                         ? expressRepos
                         : Array.isArray(user?.github?.repositories)
-                        ? user.github.repositories
-                        : Array.isArray(user?.repositories)
-                        ? user.repositories
-                        : [];
+                          ? user.github.repositories
+                          : Array.isArray(user?.repositories)
+                            ? user.repositories
+                            : [];
                       const activeRepos = userRepos
                         .map(r => typeof r === "string" ? r : r?.name)
                         .filter(Boolean);
